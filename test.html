@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Hi</title>
+	</head>
+	<body>
+		<div id="root">
+			<h1 class="we">We live in a society</h1>
+			<p>This is a paragraph</p>
+			<img
+				class="solano"
+				style="height: 500px"
+				src="https://pbs.twimg.com/media/EElo_ENXoAMzw43?format=jpg&name=4096x4096"
+				alt=""
+			/>
+		</div>
+	</body>
+	<script>
+		const live = document.querySelector('.we');
+		const owos = ['uwu', 'owo', 'ewe', 'iwi', 'We live in a society'];
+		const solano = document.querySelector('.solano');
+		let randomOwo = Math.floor(Math.random() * 5);
+		live.textContent = owos[randomOwo];
+		live.style.position = 'absolute';
+		live.style.zIndex = '2';
+		live.style.left = '10px';
+		live.style.top = '10px';
+		live.style.fontSize = '100px';
+		live.style.marginTop = '300px';
+		solano.style.position = 'absolute';
+		solano.style.zIndex = '1';
+		solano.style.left = '10px';
+		solano.style.top = '10px';
+		solano.style.marginTop = '300px';
+		let topLimit = Math.random() * 300;
+		let leftLimit = Math.random() * 300;
+		let randomSpeedTop = Math.random() * 10 + 1;
+		let randomSpeedLeft = Math.random() * 10 + 1;
+		let goingRight = true;
+		const speed = 3;
+		function getRandomColor() {
+			var letters = '0123456789ABCDEF';
+			var color = '#';
+			for (var i = 0; i < 6; i++) {
+				color += letters[Math.floor(Math.random() * 16)];
+			}
+			return color;
+		}
+
+		function move(element, img = false) {
+			const left = parseInt(element.style.left, 10);
+			if (left > leftLimit && goingRight) {
+				element.style.left = left - randomSpeedLeft + 'px';
+				goingRight = false;
+				leftLimit = Math.random() * 300;
+				if (!img) {
+					randomOwo = Math.floor(Math.random() * 5);
+					element.textContent = owos[randomOwo];
+					randomSpeedLeft = Math.random() * 10 + 1;
+				}
+			} else if (left < 0 && !goingRight) {
+				element.style.left = left + randomSpeedLeft + 'px';
+				goingRight = true;
+			} else if (goingRight) {
+				element.style.left = left + randomSpeedLeft + 'px';
+			} else {
+				element.style.left = left - randomSpeedLeft + 'px';
+			}
+		}
+		function moveTop(element, img = false) {
+			const top = parseInt(element.style.top, 10);
+			if (top > topLimit && goingRight) {
+				element.style.top = top - randomSpeedTop + 'px';
+				topLimit = Math.random() * 300;
+				randomSpeedTop = Math.random() * 10 + 1;
+				if (!img) {
+					randomOwo = Math.floor(Math.random() * 5);
+					element.textContent = owos[randomOwo];
+					goingRight = false;
+				}
+			} else if (top < 0 && !goingRight) {
+				element.style.top = top + randomSpeedTop + 'px';
+				goingRight = true;
+			} else if (goingRight) {
+				element.style.top = top + randomSpeedTop + 'px';
+			} else {
+				element.style.top = top - randomSpeedTop + 'px';
+			}
+		}
+		const time = function() {
+			setTimeout(() => {
+				move(live);
+				moveTop(live);
+				moveTop(solano, true);
+				move(solano, true);
+				time();
+			}, 10);
+		};
+		const color = function() {
+			setTimeout(() => {
+				live.style.color = getRandomColor();
+				color();
+			}, 500);
+		};
+		color();
+		time();
+	</script>
+</html>
