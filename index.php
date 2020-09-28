@@ -18,7 +18,6 @@
                 echo '</br>';
                 echo $key.' '.$par;
             }
-            echo 'xd';
         }
         
         public function prepend()
@@ -55,6 +54,7 @@
     $controller->get("/path/damn", ["prepend", "test", "test", "append"]);
     $controller->get("/path/:damn/:xd", ["test_params"]);
     $controller->get("/path/:damn", ["test_params"]);
+    $controller->get("/path/:damn/heee", ["test_params"]);
     $controller->post("/path", ["postHandler"]);
     $app->use($controller);
     $app->run();
