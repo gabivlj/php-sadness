@@ -8,10 +8,14 @@
     // $uri .= $_SERVER['HTTP_HOST'];
     // header('Location: '.$uri.'/index');
 //
-    class TestController extends Controller {
+       class TestController extends Controller {
         
         function prepend() {
+
             App::html("<html><head></head><body><p>????</p>", false);
+            $cosas = ["sss", "bbb", "lmao"];
+            $arr = map_html($cosas, function ($el) { return "<h3>{$el}</h3>"; });
+            App::html("$arr", false);
         }
 
         function append() {

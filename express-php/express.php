@@ -16,6 +16,15 @@ function requestPath()
     return $path;
 }
 
+
+function map_html($arr, $callback) {
+    $str = "";
+    foreach($arr as $element) {
+        $str .= $callback($element);
+    }
+    return $str;
+}
+
 /// Global lib state for simple helper methods
 
 function getRequestHeaders() {
@@ -35,6 +44,15 @@ class App
     private $controllers;
     static $rendered_html = false;
     static $parsed_headers = null;
+    static $query = [];
+
+
+    static function query_params() {
+        $queries = array();
+        parse_str($_SERVER['QUERY_STRING'], $queries);
+        App::$query = $queries;
+        return $queries;
+    }
 
     static function status_code($code) {
        http_response_code($code); 
