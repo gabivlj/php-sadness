@@ -113,21 +113,30 @@ class App
 
     function process_get($path) {
         foreach ($this->controllers as $key) {
-            $callback_name = $key->routes_tree_get->get($path);
-            if ($callback_name) {
-                $key->{$callback_name}();
-                break;
-            } 
+            $callback_names = $key->routes_tree_get->get($path);
+            if ($callback_names) {
+                foreach($callback_names as $callback_name) {
+                    if ($key->end) {
+                        break;
+                    }
+                    $key->{$callback_name}();
+                    
+                }
+           } 
         }
     }
 
     function process_post($path) {
         foreach ($this->controllers as $key) {
-            $callback_name = $key->routes_tree_post->get($path);
-            if ($callback_name) {
-                $key->{$callback_name}();
-                break;
-            } 
+            $callback_names = $key->routes_tree_post->get($path);
+            if ($callback_names) {
+                foreach($callback_names as $callback_name) {
+                    if ($key->end) {
+                        break;
+                    }
+                    $key->{$callback_name}();
+                }
+           } 
         }
     }
         
@@ -139,10 +148,17 @@ class Controller
     public $main_route;
     public $routes_tree_get;
     public $routes_tree_post;
+    public $end;
+    public $ctx;
+
+    public function stop() {
+        $this->end = true;
+    }
 
     public function __construct($main_route) {
         $this->main_route = $main_route;
         $this->routes_tree_get = new Tree();
+        $this->ctx = [];
 
         $this->routes_tree_post = new Tree();
     }
@@ -161,18 +177,6 @@ class Controller
     public function delete() {}
 
     
-}
-
-class TestController extends Controller {
-    function test() {
-        App::html("<h1>Cool thing</h1>");
-    }
-
-// todo: Tell a way to stop executing middleware :)
-    function postHandler() {
-        App::status_code(201);
-        App::json(['success' => 'yes', 'sent' => App::body(true) ]);
-    }
 }
 
 // This will be the route tree
