@@ -69,10 +69,10 @@
                 Html::create_el(
                     'div', 
                     ['class' => 'cool'],
-                    [Html::create_el('h1', [], 'Hey')],
-                ),
+                    [Html::create_el('h1', [], 'Hey')]
+                )
             );
-
+            
             Html::append(
                 Html::create_el(
                     "ul",
@@ -81,8 +81,8 @@
                         if ($el === '.' or $el === '..') return '';
                         return Html::create_el(
                             "a",
-                            ['href' => "{$el}"],
-                            $el,
+                            ['href' => "/exercises/{$el}"],
+                            $el
                         );
                     })
                 )
