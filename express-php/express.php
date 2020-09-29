@@ -44,17 +44,9 @@ class Html
                 return $el;
             }) :
             $content;
-        if ($children === true) {
-            $children = $atts['content'];
-        } elseif ($children === false) {
-            $children = '';
-        }
-
+        assert(gettype($children) === 'string', "Content should be an array or a string");
         $attsStr = ' ';
         foreach ($atts as $att => $val) {
-            if ($att === 'children' || $att === 'content') {
-                continue;
-            }
             $attsStr .= "{$att}=\"{$val}\"";
         }
         $str = "<{$name}{$attsStr}>{$children}</{$name}>";
