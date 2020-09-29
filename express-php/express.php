@@ -18,9 +18,13 @@ function requestPath()
 
 class Html
 {
-    public static function prepend()
+    public static function prepend($libraries = [])
     {
-        echo '<html><head></head><body>';
+        $lib = map_html($libraries, function ($lib) {
+            return Html::create_el('link', ['href' => $lib, 'rel'=>'stylesheet']);
+        });
+
+        echo "<html><head>{$lib}</head><body>";
     }
 
     public static function end()
@@ -51,7 +55,7 @@ class Html
             if ($att === 'children' || $att === 'content') {
                 continue;
             }
-            $attsStr .= "{$att}={$val}";
+            $attsStr .= "{$att}=\"{$val}\"";
         }
         $str = "<{$name}{$attsStr}>{$children}</{$name}>";
         return $str;

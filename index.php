@@ -65,12 +65,12 @@
         public function folderIndex()
         {
             $resDir = scandir("./public/exercises");
-            Html::prepend();
+            Html::prepend(['https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css']);
             Html::append(
                 Html::create_el(
                     'div',
-                    ['class' => 'cool'],
-                    [Html::create_el('h1', [], 'Hey')]
+                    ['class' => 'ml-56 text-6xl underline'],
+                    [Html::create_el('h1', [], 'Exercises')]
                 )
             );
             
@@ -84,8 +84,8 @@
                         }
                         return Html::create_el("li", [], Html::create_el(
                             "a",
-                            ['href' => "/exercises/{$el}"],
-                            $el
+                            ['href' => "/exercises/{$el}", "class" => "ml-56 underline text-xl text-green-700 hover:text-green-500"],
+                            ucfirst(implode(' ', explode("-", $el)))
                         ));
                     })
                 )
