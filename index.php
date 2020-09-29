@@ -82,11 +82,11 @@
                         if ($el === '.' or $el === '..') {
                             return '';
                         }
-                        return Html::create_el(
+                        return Html::create_el("li", [], Html::create_el(
                             "a",
                             ['href' => "/exercises/{$el}"],
                             $el
-                        );
+                        ));
                     })
                 )
             );
