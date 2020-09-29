@@ -16,6 +16,49 @@ function requestPath()
     return $path;
 }
 
+class Html
+{
+    public static function prepend()
+    {
+        echo '<html><head></head><body>';
+    }
+
+    public static function end()
+    {
+        echo '</body></html>';
+    }
+
+    public static function append($comp)
+    {
+        echo $comp;
+    }
+
+    public static function create_el($name, $atts, $content = [])
+    {
+        $children = gettype($content) === 'array' ?
+            map_html($content, function ($el) {
+                return $el;
+            }) :
+            $content;
+        if ($children === true) {
+            $children = $atts['content'];
+        } elseif ($children === false) {
+            $children = '';
+        }
+
+        $attsStr = ' ';
+        foreach ($atts as $att => $val) {
+            if ($att === 'children' || $att === 'content') {
+                continue;
+            }
+            $attsStr .= "{$att}={$val}";
+        }
+        $str = "<{$name}{$attsStr}>{$children}</{$name}>";
+        return $str;
+    }
+}
+
+
 
 function map_html($arr, $callback)
 {
@@ -96,10 +139,11 @@ class App
         return isset(App::$parsed_headers[$key]) ? App::$parsed_headers[$key] : '';
     }
 
+
     /**
      * Renders HTML text. By default it will append html and body.
      */
-    public static function html($render, $appendDefaults = true)
+    public static function html($render, $appendDefaults = false)
     {
         if (!App::$rendered_html && $appendDefaults) {
             echo '<html><head></head><body>';

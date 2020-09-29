@@ -53,13 +53,59 @@
     $controller = new TestController("/lel");
     // /path/damn should override /path/*any
     $controller->get("/path/damn", ["prepend", "test", "test", "append"]);
-    // /path/*any/*any 
+    // /path/*any/*any
     $controller->get("/path/:damn/:xd", ["test_params"]);
     // This should be /path/*any
     $controller->get("/path/:damn", ["test_params"]);
     // This should be path /path/*any/heee. SHOULD override /path/*any/*any
     $controller->get("/path/:damn/heee", ["test_params"]);
     $controller->post("/path", ["postHandler"]);
+    class ExercisesController extends Controller {
+        function folderIndex() 
+        {
+            $resDir = scandir("./public/exercises");
+            Html::prepend();
+            Html::append(
+                Html::create_el(
+                    'div', 
+                    ['class' => 'cool'],
+                    [Html::create_el('h1', [], 'Hey')],
+                ),
+            );
+
+            Html::append(
+                Html::create_el(
+                    "ul",
+                    [],
+                    map_html($resDir, function ($el) {
+                        if ($el === '.' or $el === '..') return '';
+                        return Html::create_el(
+                            "a",
+                            ['href' => "{$el}"],
+                            $el,
+                        );
+                    })
+                )
+            );
+            Html::end();
+            
+        }
+
+        function open_file() {
+            $exercise_name = App::$uri_params['id'];
+            if (!file_exists("./public/exercises/{$exercise_name}")) { 
+                App::set_response_header('Location', '/exercises');
+                return;
+            }
+            $file = file_get_contents("./public/exercises/{$exercise_name}");
+
+            echo str_replace("\n", "</br>", $file);
+        }
+    }
+    $controller_exercise = new ExercisesController("/exercises");
+    $controller_exercise->get("/", ["folderIndex"]);
+    $controller_exercise->get("/:id", ['open_file']);
     $app->use($controller);
+    $app->use($controller_exercise);
     $app->run();
 ?>
