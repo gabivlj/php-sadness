@@ -51,9 +51,13 @@
     }
     $app = new App();
     $controller = new TestController("/lel");
+    // /path/damn should override /path/*any
     $controller->get("/path/damn", ["prepend", "test", "test", "append"]);
+    // /path/*any/*any 
     $controller->get("/path/:damn/:xd", ["test_params"]);
+    // This should be /path/*any
     $controller->get("/path/:damn", ["test_params"]);
+    // This should be path /path/*any/heee. SHOULD override /path/*any/*any
     $controller->get("/path/:damn/heee", ["test_params"]);
     $controller->post("/path", ["postHandler"]);
     $app->use($controller);
