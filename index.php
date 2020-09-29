@@ -60,14 +60,15 @@
     // This should be path /path/*any/heee. SHOULD override /path/*any/*any
     $controller->get("/path/:damn/heee", ["test_params"]);
     $controller->post("/path", ["postHandler"]);
-    class ExercisesController extends Controller {
-        function folderIndex() 
+    class ExercisesController extends Controller
+    {
+        public function folderIndex()
         {
             $resDir = scandir("./public/exercises");
             Html::prepend();
             Html::append(
                 Html::create_el(
-                    'div', 
+                    'div',
                     ['class' => 'cool'],
                     [Html::create_el('h1', [], 'Hey')]
                 )
@@ -78,7 +79,9 @@
                     "ul",
                     [],
                     map_html($resDir, function ($el) {
-                        if ($el === '.' or $el === '..') return '';
+                        if ($el === '.' or $el === '..') {
+                            return '';
+                        }
                         return Html::create_el(
                             "a",
                             ['href' => "/exercises/{$el}"],
@@ -88,12 +91,12 @@
                 )
             );
             Html::end();
-            
         }
 
-        function open_file() {
+        public function open_file()
+        {
             $exercise_name = App::$uri_params['id'];
-            if (!file_exists("./public/exercises/{$exercise_name}")) { 
+            if (!file_exists("./public/exercises/{$exercise_name}")) {
                 App::set_response_header('Location', '/exercises');
                 return;
             }
