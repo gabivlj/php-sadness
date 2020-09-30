@@ -88,6 +88,18 @@ class App
     public static $query = [];
     public static $uri_params = [];
 
+    public static function serve_php($path)
+    {
+        $file = file_get_contents($path);
+        if (strpos($path, ".php")) {
+            $file = str_replace('<?php', " ", $file);
+            $file = str_replace("?>", "", $file);
+            eval($file);
+            Html::append("</div>");
+            return;
+        }
+        Html::append(str_replace("\n", "</br>", $file));
+    }
 
     public static function query_params()
     {

@@ -85,7 +85,7 @@
                         return Html::create_el("li", [], Html::create_el(
                             "a",
                             ['href' => "/exercises/{$el}", "class" => "ml-56 underline text-xl text-green-700 hover:text-green-500"],
-                            ucfirst(implode(' ', explode("-", $el)))
+                            str_replace(".php", "", ucfirst(implode(' ', explode("-", $el))))
                         ));
                     })
                 )
@@ -95,14 +95,16 @@
 
         public function open_file()
         {
+            Html::prepend(['https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css']);
             $exercise_name = App::$uri_params['id'];
             if (!file_exists("./public/exercises/{$exercise_name}")) {
                 App::set_response_header('Location', '/exercises');
                 return;
             }
-            $file = file_get_contents("./public/exercises/{$exercise_name}");
-
-            echo str_replace("\n", "</br>", $file);
+            Html::append("<div class=\"ml-5 container\">");
+            App::serve_php("./public/exercises/{$exercise_name}");
+            Html::append("</div>");
+            Html::end();
         }
     }
     $controller_exercise = new ExercisesController("/exercises");
