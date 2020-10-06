@@ -21,7 +21,7 @@ class Html
     public static function prepend($libraries = [])
     {
         $lib = map_html($libraries, function ($lib) {
-            return Html::create_el('link', ['href' => $lib, 'rel'=>'stylesheet']);
+            return Html::create_el('link', ['href' => $lib, 'rel' => 'stylesheet']);
         });
 
         echo "<html><head>{$lib}</head><body>";
@@ -136,7 +136,7 @@ class App
 
     public static function set_response_header($key, $val)
     {
-        header($key.': '.$val, true);
+        header($key . ': ' . $val, true);
     }
 
     public static function get_header($key)
@@ -162,10 +162,10 @@ class App
         if (!App::$rendered_html && $appendDefaults) {
             echo '</body></html>';
         }
-        
+
         App::$rendered_html = true;
     }
-    
+
     public function __construct()
     {
         $this->controllers = [];
@@ -188,7 +188,8 @@ class App
             case 'POST':
                 $this->process_post($path);
                 break;
-            default: echo 'Not implemented.';
+            default:
+                echo 'Not implemented.';
         }
     }
 
@@ -244,16 +245,16 @@ class Controller
 
         $this->routes_tree_post = new Tree('');
     }
-    
+
 
     public function get($total_path, $nameOfCallback)
     {
-        $this->routes_tree_get->add_path($this->main_route.$total_path, $nameOfCallback);
+        $this->routes_tree_get->add_path($this->main_route . $total_path, $nameOfCallback);
     }
 
     public function post($total_path, $nameOfCallback)
     {
-        $this->routes_tree_post->add_path($this->main_route.$total_path, $nameOfCallback);
+        $this->routes_tree_post->add_path($this->main_route . $total_path, $nameOfCallback);
     }
 
     public function put()
@@ -271,7 +272,7 @@ class Tree
     public $trees;
     public $param_name;
 
-    
+
     public function __construct($param_name_const)
     {
         $this->trees = [];
