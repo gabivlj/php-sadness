@@ -109,8 +109,12 @@ class ExercisesController extends Controller
         }
         Html::append("<div class=\"ml-5 container\">");
         App::serve_php("./public/exercises/{$exercise_name}");
+        require './public/internals/github.php';
         Html::append("</div>");
-
+        Html::append("<h2 class='text-xl ml-5 mt-56'>Code of this exercise:</h2>");
+        Html::append("<div class='container ml-5 mt-3'>");
+        Github::showPieceOfCode("https://github.com/gabivlj/php-sadness/blob/master/public/exercises/{$exercise_name}");
+        Html::append("</div>");
         Html::end();
     }
 }

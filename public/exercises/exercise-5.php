@@ -17,6 +17,7 @@ require './public/internals/remove.php';
 echo "After subs: {$toModify}<br>";
 require './public/internals/1.php';
 
+
 Html::append(Html::create_el("h2", ["class" => "text-xl"], "2.	Exercise 1 is a good example of   what shouldn’t be ever done! Instead of that, reformulate the previous code into:
   •	maths.php file with two functions to add and substract.
   •	2.php, doing the same as 1 but calling those functions.
@@ -204,6 +205,7 @@ class Circle extends Figure
 class Rectangle extends Figure
 {
   public $width;
+  public $height;
   static $numberOfRectangles;
 
   function __construct($x, $y, $width, $height)
@@ -372,3 +374,13 @@ FigureManager::get()->showRectangles();
 FigureManager::get()->showFigures();
 FigureManager::get()->remove($circle2);
 FigureManager::get()->showCircles();
+
+Html::append(Html::create_el("h2", ["class" => "text-xl"], "10.	What is the starting point when declaring paths in a require_once? Is this a good idea or you think it can give you problems?
+"));
+
+Html::append(Html::create_el("h2", ["class" => "text-md"], "The starting point in require once is the root of the server, this is a bad idea because if there is a bad import, it will show the entire path in the error message."));
+
+echo "You can use dirname to fix this so you can have dynamic filepaths";
+
+Html::append(Html::create_el("h2", ["class" => "text-xl"], "11.	What is the starting point when declaring paths in a require_once? Is this a good idea or you think it can give you problems?
+"));
