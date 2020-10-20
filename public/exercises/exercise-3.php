@@ -1,4 +1,3 @@
-
 <?php
 echo '
   1.	Can you produce this output using single quote strings?
@@ -89,5 +88,3 @@ while ($i < 100) {
     echo "</br>";
     $i++;
 }
-
-?>

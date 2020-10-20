@@ -92,10 +92,7 @@ class App
     {
         $file = file_get_contents($path);
         if (strpos($path, ".php")) {
-            $file = str_replace('<?php', " ", $file);
-            $file = str_replace("?>", "", $file);
-            eval($file);
-            Html::append("</div>");
+            require $path;
             return;
         }
         Html::append(str_replace("\n", "</br>", $file));
