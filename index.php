@@ -55,7 +55,7 @@ class TestController extends Controller
     }
 }
 $app = new App();
-$controller = new TestController("/lel");
+$controller = new TestController("/");
 // /path/damn should override /path/*any
 $controller->get("/path/damn", ["prepend", "test", "test", "append"]);
 // /path/*any/*any
@@ -123,6 +123,42 @@ $controller_exercise->get("/", ["folderIndex"]);
 $controller_exercise->get("/:id", ['open_file']);
 $app->use($controller);
 $app->use($controller_exercise);
+
+
+class Portfolio extends Controller
+{
+
+    function index()
+    {
+        Html::prep();
+        Html::append(HtmlElement::Style(
+            file_get_contents("./public/portfolio/css/main.css") .
+                "\n" .
+                file_get_contents('./public/portfolio/css/style.css')
+        )->render());
+        require './public/portfolio/php/navbar.php';
+        $body = HtmlElement::Body()->append(
+            nav([
+                [
+                    'title' => 'Unit 1',
+                    'unit' => '1',
+                    'exercises' => [['1', 'Exercise 1'], ['2', 'Exercise 2']]
+                ],
+                [
+                    'title' => 'Unit 2',
+                    'unit' => '2',
+                    'exercises' => [['1', 'Exercise 1'], ['2', 'Exercise 2']]
+                ]
+            ])
+        );
+        Html::append($body->render());
+        Html::append(HtmlElement::Javascript("./public/portfolio/js/add_redirects.js")->render());
+        Html::finish();
+    }
+}
+$controller_portfolio = new Portfolio("/portfolio");
+$controller_portfolio->get("/", ['index']);
+$app->use($controller_portfolio);
 $app->run();
 ?>
 

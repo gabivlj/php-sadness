@@ -1,0 +1,15 @@
+.showme {
+  display: none;
+}
+.showhim:hover .showme {
+  display: block;
+}
+
+.row:hover .select {
+  display: block;
+  position: absolute;
+}
+
+.select {
+  display: none;
+}

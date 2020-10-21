@@ -16,8 +16,84 @@ function requestPath()
     return $path;
 }
 
+class HtmlElement
+{
+    function __construct($tag, $atts, $content = [])
+    {
+        $this->tag = $tag;
+        $this->atts = $atts;
+        $this->content = $content;
+    }
+
+    static function Style($content)
+    {
+        return new HtmlElement("style", [], [$content]);
+    }
+
+    static function Javascript($path)
+    {
+        return new HtmlElement("script", ["src" => $path], []);
+    }
+
+    static function Script($content)
+    {
+        return new HtmlElement("script", [], [$content]);
+    }
+
+    static function Body()
+    {
+        return new HtmlElement("body", [], []);
+    }
+
+    function render()
+    {
+
+        $s = "";
+        if (is_string($this->content)) {
+            $s = $this->content;
+        } else {
+            foreach ($this->content as $child) {
+                if (is_string($child)) {
+                    $s .= $child;
+                    continue;
+                }
+                $s .= $child->render();
+            }
+        }
+
+        $attsStr = ' ';
+        foreach ($this->atts as $att => $val) {
+            $attsStr .= "{$att}=\"{$val}\"";
+        }
+        return "<{$this->tag}{$attsStr}>{$s}</{$this->tag}>";
+    }
+
+    function append($child)
+    {
+        if (is_string($child)) {
+            array_push($this->content, new HtmlElement("p", [], $child));
+            return $this;
+        }
+        array_push($this->content, $child);
+        return $this;
+    }
+}
+
 class Html
 {
+    public static function prep($libraries = [])
+    {
+        $lib = map_html($libraries, function ($lib) {
+            return Html::create_el('link', ['href' => $lib, 'rel' => 'stylesheet']);
+        });
+        echo "<html><head>{$lib}</head>";
+    }
+
+    public static function finish()
+    {
+        echo "</html>";
+    }
+
     public static function prepend($libraries = [])
     {
         $lib = map_html($libraries, function ($lib) {
@@ -85,7 +161,7 @@ class App
     private $controllers;
     public static $rendered_html = false;
     public static $parsed_headers = null;
-    public static $query = [];
+    public static $query = null;
     public static $uri_params = [];
 
     public static function serve_php($path)
@@ -100,8 +176,11 @@ class App
 
     public static function query_params()
     {
+        if (App::$query != null) {
+            return App::$query;
+        }
         $queries = array();
-        parse_str($_SERVER['QUERY_STRING'], $queries);
+        parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY), $queries);
         App::$query = $queries;
         return $queries;
     }

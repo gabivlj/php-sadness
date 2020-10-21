@@ -1,0 +1,22 @@
+
+10.	What is the difference between a WAMP, a MAMP, and a LAMP?
+MAMP is MacOS
+LAMP is Linux
+WAMP is Windows
+11.	What does XAMPP stands for?
+Xamp stands for any of the SO.
+12.	What is the Root Folder in Apache Web Server?
+The 'root directory' is actually called the document root, which is the directory from which the Apache HTTP server would serve files from. Htdocs.
+13.	What are the main differences between the production and the development environment? Do I need both?
+	Production is useful for users and needs more security. The development environment   	is easier to see changes.
+14.	What do the IP address 127.0.0.1 and the URL http://localhost have in common?
+It’s the default name for the local computer address.
+15.	If I store a folder called 123 inside my Root folder and a file inside that folder called 456.png how can I browse that file from my browser?
+	http://localhost/123/456.png
+16.	What is the purpose of an FTP program?
+	Transferring files to production.
+17.	Name the main disadvantage of working on a local web server? And working on a remote web server. 
+A user can’t access a local web server. 
+In a remote web server changes are slower to see and tedious.
+18.	Pick an FTP client (Filezilla is my suggestion), install it and configure it so you can access your production server.
+	Yes.

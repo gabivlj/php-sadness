@@ -1,6 +1,9 @@
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/blob
+RewriteCond %{REQUEST_URI} !^/public/portfolio/js
+ErrorDocument 404 /index.php
 RewriteRule ^(.*)$ index.php?/$1 [L]
 Options -Indexes
 

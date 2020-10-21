@@ -1,0 +1,49 @@
+
+
+1 – Dynamic Websites:
+1.	What is a front-end developer? And a back-end developer? And full-stack developer?
+Front end dev is an engineer which is in charge of the development (typically) of the user platforms, like mobile and web.
+Back end dev is an engineer which is in charge of the non-user facing application, typically a server.
+Fullstack developer is in charge of both roles.
+
+2.	What basic components (at the minimum) are needed to turn a static web page into a fully dynamic web page? 
+A server, a persistent storage service like a DB, a web page with JavaScript/Template Engine on the server.
+3.	What does HTML stand for? What is its role in dynamic webpages?
+Hyper Text Markdown Language, which marks the elements of your webpage like buttons or inputs.
+4.	 Why does the name MySQL contain the letters SQL? 
+SQL is the language and MySQL is the implementation.
+5.	PHP and JavaScript are both programming languages that generate dynamic results for web pages. What is their main difference, and why would you need to use both of them? 
+JavaScript for the client side (usually) and PHP on the server side.
+6.	What does CSS stand for? What is its role in dynamic web pages?
+Cascading Style Sheets serve the purpose of adding style and complex designs to your websites. 
+7.	List three major new elements introduced in HTML5.
+Canvas, video, header.
+8.	What is a DNS? How does it work?
+Stores the corresponding IP addresses for domains
+9.	Can you create a “sequence diagram” (like the ones from slides 8 and 10) showing the flow of the AJAX example (in slide 24-26). 
+
+CLIENT                              SERVER                      PERSISTENT STORAGE
+
+REQUEST PAGE -------------------->  FIND PAGE --------------->   
+
+                                    SERVES PAGE DATA    <--------------   RETURNS PAGE
+                                    (SOMETIMES FILLS DYNAMIC TEMPLATE VARIABLES)
+SHOWS HTML5 PAGE  <--------------------/
+USER CLICKS ON BUTTON,
+WITH JAVASCRIPT IT
+SENDS A FETCH/Xmlhttprequest
+POST REQUEST THAT HAS THE BODY AND --->  RECEIVES DATA AND SAVES IT ---------> SAVE DATA
+QUERY PARAMETERS TO THE SPECIFIED URL.       
+                                        <----- SENDS THE UPDATE AND SUCCESS <------ INFORMS THAT THE ACTION IS SUCCESSFUL
+SHOWS NEW DATA UPDATING THE HTML5 
+WITH JAVASCRIPT DYNAMICALLY
+
+10.	What is the difference between a WAMP, a MAMP, and a LAMP?
+11.	What does XAMPP stands for?
+12.	What is the Root Folder in Apache Web Server?
+13.	What are the main differences between the production and the development environment? Do I need both?
+14.	What do the IP address 127.0.0.1 and the URL http://localhost have in common?
+15.	If I store a folder called 123 inside my Root folder and a file inside that folder called 456.png how can I browse that file from my browser?
+16.	What is the purpose of an FTP program?
+17.	Name the main disadvantage of working on a local web server? And working on a remote web server. 
+18.	Pick an FTP client (Filezilla is my suggestion), install it and configure it so you can access your production server.
