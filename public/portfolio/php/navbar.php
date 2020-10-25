@@ -16,7 +16,7 @@ function navButton($text, $unit, $exercises = [])
   }
   $buttonsStack =  new HtmlElement(
     "div",
-    ["class" => "showme bg-teal-900 z-0 absolute"],
+    ["class" => "showme bg-white z-0 absolute bg-white"],
     $buttons
   );
   return new HtmlElement(
@@ -24,7 +24,7 @@ function navButton($text, $unit, $exercises = [])
     ["class" => "showhim inline-block"],
     [new HtmlElement(
       "div",
-      ["class" => "text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 lg:mt-0"],
+      ["class" => "text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 lg:mt-0 ml-3"],
       [$text]
     ), $buttonsStack]
   );

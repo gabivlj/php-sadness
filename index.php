@@ -137,20 +137,17 @@ class Portfolio extends Controller
                 file_get_contents('./public/portfolio/css/style.css')
         )->render());
         require './public/portfolio/php/navbar.php';
+        require './public/portfolio/php/finder.php';
         $body = HtmlElement::Body()->append(
-            nav([
-                [
-                    'title' => 'Unit 1',
-                    'unit' => '1',
-                    'exercises' => [['1', 'Exercise 1'], ['2', 'Exercise 2']]
-                ],
-                [
-                    'title' => 'Unit 2',
-                    'unit' => '2',
-                    'exercises' => [['1', 'Exercise 1'], ['2', 'Exercise 2']]
-                ]
-            ])
+            nav(getAllUnits())
         );
+        $q = App::query_params();
+        if (
+            isset($q['unit']) && isset($q['exercise'])
+        ) {
+
+            print("<pre>" . print_r(getAllFilesExercise($q['unit'], $q['exercise']), true) . "</pre>");
+        }
         Html::append($body->render());
         Html::append(HtmlElement::Javascript("./public/portfolio/js/add_redirects.js")->render());
         Html::finish();
