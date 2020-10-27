@@ -131,23 +131,16 @@ class Portfolio extends Controller
     function index()
     {
         Html::prep();
-        Html::append(HtmlElement::Style(
-            file_get_contents("./public/portfolio/css/main.css") .
-                "\n" .
-                file_get_contents('./public/portfolio/css/style.css')
-        )->render());
+        $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
+        $projectCSS = file_get_contents('./public/portfolio/css/style.css');
+        Html::append(HtmlElement::Style("$tailwindCSS $projectCSS")->render());
         require './public/portfolio/php/navbar.php';
         require './public/portfolio/php/finder.php';
         require './public/portfolio/php/file_tree.php';
-        $body = HtmlElement::Body()->append(
-            nav(getAllUnits())
-        );
-        $q = App::query_params();
-        if (
-            isset($q['unit']) && isset($q['exercise'])
-        ) {
-            $tree = getAllFilesExercise($q['unit'], $q['exercise']);
-            // print("<pre>" . print_r(getAllFilesExercise($q['unit'], $q['exercise']), true) . "</pre>");
+        $body = HtmlElement::Body()->append(nav(getAllUnits()));
+        $query_params = App::query_params();
+        if (isset($query_params['unit']) && isset($query_params['exercise'])) {
+            $tree = getAllFilesExercise($query_params['unit'], $query_params['exercise']);
             $treeNode = showTree($tree);
             $body->append($treeNode);
         }
