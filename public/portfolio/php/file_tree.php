@@ -3,13 +3,14 @@ require './public/portfolio/php/icons.php';
 function buttonNode($name, $isFile = false, $path = '')
 {
   $iconElement = $isFile ? fileIcon() : folderIcon();
+  // Update the query params for exampleto: unit=2&exercise=3&file=folder>exercise
   $q = App::query_params();
   $q['file'] = $path;
   $res = http_build_query($q);
   $class = $isFile ? 'file' : 'folder';
   return new HtmlElement(
     !$isFile ? 'div' : 'a',
-    ['class' => "inline-flex items-center mt-4 cursor-pointer text-teal-700 hover:text-teal-400 {$class} mr-4", "href" => "/portfolio?{$res}"],
+    ['class' => "inline-flex items-center mt-4 cursor-pointer text-teal-700 hover:text-teal-400 mr-4", "href" => "/portfolio?{$res}"],
     [$iconElement, $name]
   );
 }
@@ -18,7 +19,7 @@ function buttonNode($name, $isFile = false, $path = '')
 function showTree($treeNode, $depth = 1, $path = '')
 {
   $tree = new HtmlElement("div", [], []);
-  foreach ($treeNode as $name => $value) {
+  foreach ($treeNode as $_ => $value) {
     if (!isset($value['name'])) {
       continue;
     }
@@ -31,10 +32,11 @@ function showTree($treeNode, $depth = 1, $path = '')
     if ($isFolder) {
       array_push($displayChildren, showTree($children, $depth + 1, $newPath));
     }
+    $folderDisplay = $isFolder ? "folder" : '';
     $tree->append(new HtmlElement(
       "div",
       ['class' => 'ml-3'],
-      [buttonNode("{$name}", !$isFolder, $newPath), new HtmlElement('div', [], $displayChildren)]
+      [buttonNode("{$name}", !$isFolder, $newPath), new HtmlElement('div', ['class' => "$folderDisplay"], $displayChildren)]
     ));
   }
   return $tree;

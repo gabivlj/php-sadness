@@ -153,6 +153,7 @@ class Portfolio extends Controller
         }
         Html::append($body->render());
         Html::append(HtmlElement::Javascript("./public/portfolio/js/add_redirects.js")->render());
+        Html::append(HtmlElement::Javascript("./public/portfolio/js/folder.js")->render());
         Html::finish();
     }
 }
