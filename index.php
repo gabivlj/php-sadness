@@ -138,6 +138,7 @@ class Portfolio extends Controller
         )->render());
         require './public/portfolio/php/navbar.php';
         require './public/portfolio/php/finder.php';
+        require './public/portfolio/php/file_tree.php';
         $body = HtmlElement::Body()->append(
             nav(getAllUnits())
         );
@@ -145,8 +146,10 @@ class Portfolio extends Controller
         if (
             isset($q['unit']) && isset($q['exercise'])
         ) {
-
-            print("<pre>" . print_r(getAllFilesExercise($q['unit'], $q['exercise']), true) . "</pre>");
+            $tree = getAllFilesExercise($q['unit'], $q['exercise']);
+            // print("<pre>" . print_r(getAllFilesExercise($q['unit'], $q['exercise']), true) . "</pre>");
+            $treeNode = showTree($tree);
+            $body->append($treeNode);
         }
         Html::append($body->render());
         Html::append(HtmlElement::Javascript("./public/portfolio/js/add_redirects.js")->render());
