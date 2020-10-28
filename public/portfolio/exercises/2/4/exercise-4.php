@@ -9,25 +9,44 @@ function createList($list, $type = "ul")
   }));
 }
 
-Html::append(createList(["apple", "orange", "banana"]));
+Html::append(
+  createList(["apple", "orange", "banana"])
+);
 
-Html::append(Html::create_el("p", [], "3.	Can you create a function to create tables in HTML? It should receive a multidimensional array, with the data to fill the HTML table. It will return the string with the resulting HTML. It shouldn’t modify the strings."));
+Html::append(
+  Html::create_el(
+    "p",
+    [],
+    "3.	Can you create a function to create tables in HTML? It should receive a multidimensional array, with the data to fill the HTML table. It will return the string with the resulting HTML. It shouldn’t modify the strings."
+  )
+);
 
 function table($matrix)
 {
 
-  return Html::create_el("table", ["class" => "table-fixed"], [
-    Html::create_el("thead", [], map_html(array_slice($matrix, 0, 1), function ($list) {
-      return Html::create_el("tr", ["class" => "bg-gray-100"], map_html($list, function ($el) {
-        return Html::create_el("td", ["class" => "border px-4 py-2"], $el);
-      }));
-    })),
-    map_html(array_slice($matrix, 1), function ($list) {
-      return Html::create_el("tr", [], map_html($list, function ($el) {
-        return Html::create_el("td", ["class" => "border px-4 py-2"], $el);
-      }));
-    })
-  ]);
+  return Html::create_el(
+    "table",
+    ["class" => "table-fixed"],
+    [
+      Html::create_el(
+        "thead",
+        [],
+        map_html(
+          array_slice($matrix, 0, 1),
+          function ($list) {
+            return Html::create_el("tr", ["class" => "bg-gray-100"], map_html($list, function ($el) {
+              return Html::create_el("td", ["class" => "border px-4 py-2"], $el);
+            }));
+          }
+        )
+      ),
+      map_html(array_slice($matrix, 1), function ($list) {
+        return Html::create_el("tr", [], map_html($list, function ($el) {
+          return Html::create_el("td", ["class" => "border px-4 py-2"], $el);
+        }));
+      })
+    ]
+  );
 }
 
 Html::append(Html::create_el("div", [], table([['Number', 'Cool', 'Yes', '!'], ['1', '2', '3', '4']])));

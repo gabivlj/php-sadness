@@ -18,7 +18,7 @@ function buttonNode($name, $isFile = false, $path = '')
 
 function showTree($treeNode, $depth = 1, $path = '')
 {
-  $tree = new HtmlElement("div", [], []);
+  $tree = new HtmlElement("div", ['class' => 'flex-auto'], []);
   foreach ($treeNode as $_ => $value) {
     if (!isset($value['name'])) {
       continue;

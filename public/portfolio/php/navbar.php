@@ -11,7 +11,8 @@ function navButton($text, $unit, $exercises = [])
   foreach ($exercises as $exercise) {
     array_push($buttons, redirectButton(
       ["exercise" => $exercise[0], 'unit' => $unit],
-      $exercise[1]
+      $exercise[1],
+      ['file', 'download', 'interpret']
     ));
   }
   $buttonsStack =  new HtmlElement(

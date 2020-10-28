@@ -6,14 +6,16 @@
  * @param Array<String, String> $tags The new key values to modify
  * @param String $name The value that will show the button
  */
-function redirectButton($tags, $name)
+function redirectButton($tags, $name, $deleteTags = [])
 {
   $q = App::query_params();
   foreach ($tags as $tag => $value) {
     $q[$tag] = $value;
-    $res = http_build_query($q);
   }
-
+  foreach ($deleteTags as $tag) {
+    unset($q[$tag]);
+  }
+  $res = http_build_query($q);
   return new HtmlElement(
     "div",
     [

@@ -89,6 +89,13 @@ class Html
         echo "<html><head>{$lib}</head>";
     }
 
+    public static function wrapPHPCode($file, $dst)
+    {
+        echo "<div id='WRAPPER_PHP_CODE' dst='$dst'>";
+        require $file;
+        echo "</div>";
+    }
+
     public static function finish()
     {
         echo "</html>";

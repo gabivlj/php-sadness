@@ -130,22 +130,67 @@ class Portfolio extends Controller
 
     function index()
     {
-        Html::prep();
+        Html::prep(['//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/default.min.css']);
         $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
         $projectCSS = file_get_contents('./public/portfolio/css/style.css');
         Html::append(HtmlElement::Style("$tailwindCSS $projectCSS")->render());
         require './public/portfolio/php/navbar.php';
         require './public/portfolio/php/finder.php';
         require './public/portfolio/php/file_tree.php';
-        $body = HtmlElement::Body()->append(nav(getAllUnits()));
+
+        $body = HtmlElement::Body()
+            ->append(
+                HtmlElement::Javascript(
+                    '//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/highlight.min.js'
+                )
+            )->append(nav(getAllUnits()));
         $query_params = App::query_params();
-        if (isset($query_params['unit']) && isset($query_params['exercise'])) {
+        $hasUnit = isset($query_params['unit']);
+        $hasExercise = isset($query_params['exercise']);
+        // Check if we want to show units/exercise fileFolder
+        if ($hasUnit && $hasExercise) {
             $tree = getAllFilesExercise($query_params['unit'], $query_params['exercise']);
             $treeNode = showTree($tree);
-            $body->append($treeNode);
+            $container = new HtmlElement('div', ['class' => 'flex'], []);
+            $container->append($treeNode);
+            // Check if we want a file
+            if (isset($query_params['file']) && $hasUnit && $hasExercise) {
+                // extract parameters and sanitized
+                $interpret = isset($query_params['interpret']) &&
+                    $query_params['interpret'] == 'true';
+                $normalizedPath = str_replace(">", "/", $query_params['file']);
+                $unit = $query_params['unit'];
+                $exercise = $query_params['exercise'];
+                $completePath = "public/portfolio/exercises/$unit/$exercise/$normalizedPath";
+                // Check if the path is good
+                if (file_exists($completePath)) {
+                    if ($interpret) {
+                        $container->append(new HtmlElement('div', ['class' => 'wrapper-php flex-1 w-64 h-64 overflow-y-auto'], []));
+                        // !! Important: we need to import the wrapper-php.js code so we get the 
+                        // !! echoes and add it into the part of the dom that we want
+                        Html::wrapPHPCode($completePath, 'wrapper-php');
+                    } else {
+                        // Just append the raw text into a syntax highlighter
+                        $container->append(new HtmlElement(
+                            'pre',
+                            ['class' => 'flex-1 w-64 h-64 overflow-y-auto'],
+                            [new HtmlElement('code', ['class' => 'max-w-screen-md h-64 overflow-y-auto'], [str_replace('<?php', '', file_get_contents($completePath))])]
+                        ));
+                    }
+                    // Controls
+                    $container->append(new HTMLElement('div', ['class' => 'flex-auto w-4 m-4'], [
+                        redirectButton(['interpret' => 'true'], 'Interpret', ['download']),
+                        redirectButton(['interpret' => 'false'], 'Show file', ['download']),
+                        redirectButton(['download' => 'true'], 'Download file')
+                    ]));
+                }
+            }
+            $body->append($container);
         }
         Html::append($body->render());
+        Html::append(HtmlElement::Script('hljs.initHighlightingOnLoad();')->render());
         Html::append(HtmlElement::Javascript("./public/portfolio/js/add_redirects.js")->render());
+        Html::append(HtmlElement::Javascript("./public/portfolio/js/wrapper-php.js")->render());
         Html::append(HtmlElement::Javascript("./public/portfolio/js/folder.js")->render());
         Html::finish();
     }
