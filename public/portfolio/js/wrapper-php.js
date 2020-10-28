@@ -1,4 +1,8 @@
-const wrapperElement = document.getElementById('WRAPPER_PHP_CODE');
-wrapperElement.remove();
-// console.log(wrapperElement.attributes.dst.nodeValue)
-document.querySelector(`.${wrapperElement.attributes.dst.nodeValue}`).appendChild(wrapperElement);
+function main() {
+  const wrapperElement = document.getElementById('WRAPPER_PHP_CODE');
+  if (!wrapperElement) return;
+  wrapperElement.remove();
+  document.querySelector(`.${wrapperElement.attributes.dst.nodeValue}`).appendChild(wrapperElement);
+}
+
+main();
