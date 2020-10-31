@@ -20,7 +20,7 @@ function redirectButton($tags, $name, $deleteTags = [])
     "div",
     [
       "class" => "text-sm px-4 bg-teal-900 py-2 leading-none border text-white border-white 
-      hover:border-transparent hover:text-teal-500 p-1 hover:bg-white w-36 redirecter rounded",
+      hover:border-transparent hover:text-teal-500 p-1 hover:bg-white w-36 redirecter rounded  cursor-pointer ",
       "href" => "/portfolio?{$res}"
     ],
     [$name]

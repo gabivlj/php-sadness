@@ -6,32 +6,39 @@ class Portfolio extends Controller
   function index()
   {
     $query_params = App::query_params();
+    if (
+      isset($query_params['download_all']) &&
+      isset($query_params['unit']) && isset($query_params['exercise'])
+      && isset($query_params['file'])
+    ) {
+      $path = str_replace(">", "/", $query_params['file']);
+      $pieces = implode("/", array_slice(explode("/", $path), 0, -1));
+      $parsedPath = "/$pieces";
+      require './public/portfolio/php/download.php';
+      // Extract query params
+      $unit = $query_params['unit'];
+      $exercise = $query_params['exercise'];
+      $path = "./public/portfolio/exercises/{$unit}/{$exercise}{$parsedPath}";
+      $temp_dir = sys_get_temp_dir();
+      downloadFolderASZip($path, tempnam($temp_dir, "Unit{$unit}Exercise$exercise.zip"), ['public', 'portfolio', 'exercises', "$unit", "$exercise"]);
+      return;
+    }
     // Time to download some files!
     if (
       isset($query_params['download']) &&
       isset($query_params['file']) &&
       isset($query_params['unit'])
     ) {
+      require './public/portfolio/php/download.php';
       $fileNameForDownload = str_replace(">", "", $query_params['file']);
-
-      // Set response headers so it streams the file into the browser
-      App::set_response_header('Content-Type', 'text/plain');
-      App::set_response_header('Pragma', 'no-cache');
-      App::set_response_header(
-        'Content-Disposition',
-        "attachment; filename={$fileNameForDownload}"
-      );
-
       // Normalized path
       $normalizedPath = str_replace(">", "/", $query_params['file']);
-
       // Extract query params
       $unit = $query_params['unit'];
       $exercise = $query_params['exercise'];
-
       // Get complete normalized path
       $completePath = "public/portfolio/exercises/$unit/$exercise/$normalizedPath";
-      readfile($completePath);
+      downloadFile($fileNameForDownload, $completePath);
       return;
     }
 
@@ -117,9 +124,10 @@ class Portfolio extends Controller
 
           // Button controls
           $container->append(new HTMLElement('div', ['class' => 'flex-1 w-4 m-4'], [
-            redirectButton(['interpret' => 'true'], 'Interpret', ['download']),
-            redirectButton(['interpret' => 'false'], 'Show file', ['download']),
-            redirectButton(['download' => 'true'], 'Download file')
+            redirectButton(['interpret' => 'true'], 'Interpret', ['download', 'download_all']),
+            redirectButton(['interpret' => 'false'], 'Show file', ['download', 'download_all']),
+            redirectButton(['download' => 'true'], 'Download file'),
+            redirectButton(['download_all' => 'true'], 'Download all files'),
           ]));
         }
       }
