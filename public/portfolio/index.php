@@ -20,7 +20,11 @@ class Portfolio extends Controller
       $exercise = $query_params['exercise'];
       $path = "./public/portfolio/exercises/{$unit}/{$exercise}{$parsedPath}";
       $temp_dir = sys_get_temp_dir();
-      downloadFolderASZip($path, tempnam($temp_dir, "Unit{$unit}Exercise$exercise.zip"), ['public', 'portfolio', 'exercises', "$unit", "$exercise"]);
+      downloadFolderASZip(
+        $path,
+        tempnam($temp_dir, "Unit{$unit}Exercise$exercise.zip"),
+        ['public', 'portfolio', 'exercises', "$unit", "$exercise"]
+      );
       return;
     }
     // Time to download some files!
