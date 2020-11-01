@@ -2,7 +2,7 @@ const folders = Array.from(document.querySelectorAll('.folder'));
 
 for (let i = 0; i < folders.length; i++) {
   for (let j = 0; j < folders[i].children.length; j++) {
-    console.log(folders[i].children[j].classList.add('invisible'));    
+    console.log(folders[i].children[j].classList.add('hidden'));    
   }
   // Add state of the folder
   folders[i].removed = true;
@@ -11,11 +11,11 @@ for (let i = 0; i < folders.length; i++) {
     // remove and add folders depending on the folder state!
     if (folders[i].removed) {    
       for (let j = 0; j < folders[i].children.length; j++) {
-        folders[i].children[j].classList.remove('invisible');
+        folders[i].children[j].classList.remove('hidden');
       }
     } else {
       for (let j = 0; j < folders[i].children.length; j++) {
-        folders[i].children[j].classList.add('invisible');
+        folders[i].children[j].classList.add('hidden');
       }
     }
     folders[i].removed = !folders[i].removed;

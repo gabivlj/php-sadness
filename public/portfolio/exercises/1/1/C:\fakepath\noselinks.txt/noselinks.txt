@@ -1,0 +1,15 @@
+Busca y selecciona tres fragmentos de un videojuego/película en el que el sonido aporte, concrete, añada o anticipe información complementaria a la imagen.
+
+
+
+Añade un enlace donde se encuentra alojado el vídeo o adjunta un archivo de vídeo inferior a 100 MB.
+Especifica el sonido y rango de tiempo en donde se produce el sonido estudiado. Por ejemplo: en un vídeo de Youtube, 1.54 min - 2,06 minutos, sonido de lluvia.
+Responde a las siguientes preguntas:
+¿Aparece la fuente de sonido en la imagen?
+¿Cuál es su aportación narrativa? ¿Añade información, concreta información, anticipa acontecimientos?
+Si ese sonido no apareciera en la diégesis, ¿cómo afectaría su ausencia?
+
+
+https://www.youtube.com/watch?v=AQACnmU8XI0
+https://www.youtube.com/watch?v=9tnggF0ck7E
+https://www.youtube.com/watch?v=K8hokZ0CJ3U

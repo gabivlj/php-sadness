@@ -26,3 +26,15 @@ function redirectButton($tags, $name, $deleteTags = [])
     [$name]
   );
 }
+
+function postButton($name, $hitPath, $params, $useFile = "false")
+{
+  return new HtmlElement(
+    "button",
+    array_merge([
+      "class" => "text-sm px-4 bg-teal-900 py-2 leading-none border text-white border-white 
+      hover:border-transparent hover:text-teal-500 p-1 hover:bg-white w-36  rounded cursor-pointer postInput",
+    ], $params, ['hit' => $hitPath, 'useFile' => "$useFile"]),
+    [$name]
+  );
+}

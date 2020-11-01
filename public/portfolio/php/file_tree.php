@@ -7,7 +7,6 @@ function buttonNode($name, $isFile = false, $path = '')
   $q = App::query_params();
   $q['file'] = $path;
   $res = http_build_query($q);
-  $class = $isFile ? 'file' : 'folder';
   return new HtmlElement(
     !$isFile ? 'div' : 'a',
     ['class' => "inline-flex items-center mt-4 cursor-pointer text-teal-700 hover:text-teal-400 mr-4", "href" => "/portfolio?{$res}"],

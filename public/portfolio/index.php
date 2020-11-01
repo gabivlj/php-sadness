@@ -2,6 +2,39 @@
 
 class Portfolio extends Controller
 {
+  function mkdir()
+  {
+    $exercise = $_POST['exercise'];
+    $unit = $_POST['unit'];
+    $path = $_POST['path'];
+    if (!is_dir("./public/portfolio/exercises/$unit/$exercise/$path")) {
+      mkdir("./public/portfolio/exercises/$unit/$exercise/$path", 0777, true);
+    }
+    App::json(['success' => true]);
+  }
+
+  function fileUpload()
+  {
+    if (!isset($_FILES['file'])) {
+      App::json([
+        'success' => false,
+        'message' => 'POST request should be included with the file parameter'
+      ]);
+      return;
+    }
+    $exercise = $_POST['exercise'];
+    $unit = $_POST['unit'];
+    $path = $_POST['path'];
+    if (!is_dir("./public/portfolio/exercises/$unit/$exercise/$path")) {
+      mkdir("./public/portfolio/exercises/$unit/$exercise/$path", 0777, true);
+    }
+    move_uploaded_file(
+      $_FILES["file"]["tmp_name"],
+      "./public/portfolio/exercises/$unit/$exercise/$path{$_FILES["file"]["name"]}"
+    );
+    App::json(['success' => true]);
+    require './public/portfolio/php/upload.php';
+  }
 
   function index()
   {
@@ -125,13 +158,17 @@ class Portfolio extends Controller
               [new HtmlElement('code', ['class' => ' overflow-y-auto'], [str_replace('<?php', '', file_get_contents($completePath))])]
             ));
           }
-
+          $pathForCreateFile = implode("/", array_slice(explode("/", "$normalizedPath"), 0, -1));
           // Button controls
           $container->append(new HTMLElement('div', ['class' => 'flex-1 w-4 m-4'], [
             redirectButton(['interpret' => 'true'], 'Interpret', ['download', 'download_all']),
             redirectButton(['interpret' => 'false'], 'Show file', ['download', 'download_all']),
             redirectButton(['download' => 'true'], 'Download file'),
             redirectButton(['download_all' => 'true'], 'Download all files'),
+            postButton('Create File In This File Folder', '/', [
+              'path' => "$pathForCreateFile/", 'unit' => $unit, 'exercise' => $exercise
+            ], "true"),
+            new HtmlElement('input', ['id' => 'inputFolder', 'type' => 'text', 'value' => 'Write/Folder'], ''),
           ]));
         }
       }
@@ -146,6 +183,7 @@ class Portfolio extends Controller
     Html::append(HtmlElement::Javascript("./public/portfolio/js/add_redirects.js")->render());
     Html::append(HtmlElement::Javascript("./public/portfolio/js/wrapper-php.js")->render());
     Html::append(HtmlElement::Javascript("./public/portfolio/js/folder.js")->render());
+    Html::append(HtmlElement::Javascript("./public/portfolio/js/post_input.js")->render());
 
     // Tell the framework that we finished rendering HTML
     Html::finish();
@@ -154,3 +192,5 @@ class Portfolio extends Controller
 
 $controller_portfolio = new Portfolio("/portfolio");
 $controller_portfolio->get("/", ['index']);
+$controller_portfolio->post("/", ['fileUpload']);
+$controller_portfolio->post("/mkdir", ['mkdir']);
