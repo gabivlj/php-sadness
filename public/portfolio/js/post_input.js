@@ -14,16 +14,20 @@ posts.forEach(post => {
         if (key === 'class') return;
         formData.append(rest[key].nodeName, rest[key].nodeValue);
       });
-      console.log(input);
       formData.append('path', `${inputFolder.value}/`);
       formData.append('file', file);
-      console.log(inputFolder.value);
       fetch(`${window.location.protocol}${window.location.pathname}${hit.nodeValue}`, {
         method: 'POST',
         body: formData,
       }).then(res => {
+        if (!res) return;
         return res.json();
-      }).then(res => console.log(res));
+      }).then(res => {
+        console.log(res)
+        window.location.reload();
+      }).catch(err => {
+        console.error(err);
+      });
     }    
   });
 });

@@ -79,6 +79,33 @@ class HtmlElement
     }
 }
 
+class HtmlRoot
+{
+    private static $html;
+    public static $head;
+
+    public static function prep($libraries)
+    {
+        HtmlRoot::$html = new HtmlElement("html", [], []);
+        HtmlRoot::$head = new HtmlElement('head', [], []);
+        foreach ($libraries as $lib) {
+            HtmlRoot::$head
+                ->append(new HtmlElement('link', ['href' => $lib, 'rel' => 'stylesheet']));
+        }
+        HtmlRoot::$html->append(HtmlRoot::$head);
+    }
+
+    public static function append($child)
+    {
+        HtmlRoot::$html->append($child);
+    }
+
+    public static function end()
+    {
+        Html::append(HtmlRoot::$html->render());
+    }
+}
+
 class Html
 {
     public static function prep($libraries = [])
@@ -170,6 +197,23 @@ class App
     public static $parsed_headers = null;
     public static $query = null;
     public static $uri_params = [];
+
+    public static function get_file($key)
+    {
+        if (!isset($_FILES[$key])) {
+            return null;
+        }
+        return $_FILES[$key];
+    }
+
+    public static function get_form_value($key)
+    {
+        if (!isset($_POST[$key])) {
+            return null;
+        }
+        return $_POST[$key];
+    }
+
 
     public static function serve_php($path)
     {

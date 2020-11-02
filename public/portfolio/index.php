@@ -2,11 +2,13 @@
 
 class Portfolio extends Controller
 {
+  private $maximumUploadSize = 10485760;
+
   function mkdir()
   {
-    $exercise = $_POST['exercise'];
-    $unit = $_POST['unit'];
-    $path = $_POST['path'];
+    $exercise = App::get_form_value('exercise');
+    $unit = App::get_form_value('unit');
+    $path = App::get_form_value('path');
     if (!is_dir("./public/portfolio/exercises/$unit/$exercise/$path")) {
       mkdir("./public/portfolio/exercises/$unit/$exercise/$path", 0777, true);
     }
@@ -15,25 +17,49 @@ class Portfolio extends Controller
 
   function fileUpload()
   {
-    if (!isset($_FILES['file'])) {
+    $file = App::get_file('file');
+    if ($file == null) {
       App::json([
         'success' => false,
-        'message' => 'POST request should be included with the file parameter'
+        'message' => 'POST request should be included with the `file` parameter'
       ]);
       return;
     }
-    $exercise = $_POST['exercise'];
-    $unit = $_POST['unit'];
-    $path = $_POST['path'];
+    if ($file['size'] > $this->maximumUploadSize) {
+      App::json(['success' => false, 'message' => 'file too big...']);
+      return;
+    }
+    $exercise = App::get_form_value('exercise');
+    $unit = App::get_form_value('unit');
+    $path = App::get_form_value('path');
     if (!is_dir("./public/portfolio/exercises/$unit/$exercise/$path")) {
       mkdir("./public/portfolio/exercises/$unit/$exercise/$path", 0777, true);
     }
     move_uploaded_file(
-      $_FILES["file"]["tmp_name"],
-      "./public/portfolio/exercises/$unit/$exercise/$path{$_FILES["file"]["name"]}"
+      $file["tmp_name"],
+      "./public/portfolio/exercises/$unit/$exercise/$path{$file["name"]}"
     );
     App::json(['success' => true]);
     require './public/portfolio/php/upload.php';
+  }
+
+  function downloadZip()
+  {
+    $query_params = App::query_params();
+    $path = str_replace(">", "/", $query_params['file']);
+    $pieces = implode("/", array_slice(explode("/", $path), 0, -1));
+    $parsedPath = "/$pieces";
+    require './public/portfolio/php/download.php';
+    // Extract query params
+    $unit = $query_params['unit'];
+    $exercise = $query_params['exercise'];
+    $path = "./public/portfolio/exercises/{$unit}/{$exercise}{$parsedPath}";
+    $temp_dir = sys_get_temp_dir();
+    downloadFolderASZip(
+      $path,
+      tempnam($temp_dir, "Unit{$unit}Exercise$exercise.zip"),
+      ['public', 'portfolio', 'exercises', "$unit", "$exercise"]
+    );
   }
 
   function index()
@@ -44,20 +70,7 @@ class Portfolio extends Controller
       isset($query_params['unit']) && isset($query_params['exercise'])
       && isset($query_params['file'])
     ) {
-      $path = str_replace(">", "/", $query_params['file']);
-      $pieces = implode("/", array_slice(explode("/", $path), 0, -1));
-      $parsedPath = "/$pieces";
-      require './public/portfolio/php/download.php';
-      // Extract query params
-      $unit = $query_params['unit'];
-      $exercise = $query_params['exercise'];
-      $path = "./public/portfolio/exercises/{$unit}/{$exercise}{$parsedPath}";
-      $temp_dir = sys_get_temp_dir();
-      downloadFolderASZip(
-        $path,
-        tempnam($temp_dir, "Unit{$unit}Exercise$exercise.zip"),
-        ['public', 'portfolio', 'exercises', "$unit", "$exercise"]
-      );
+      $this->downloadZip();
       return;
     }
     // Time to download some files!
@@ -80,15 +93,16 @@ class Portfolio extends Controller
     }
 
     // Prepare all the dependencies and tell the framework that we will be rendering HTML
-    Html::prep(['//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/default.min.css']);
+    HtmlRoot::prep(['//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/default.min.css']);
     $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
     $projectCSS = file_get_contents('./public/portfolio/css/style.css');
-    Html::append(HtmlElement::Style("$tailwindCSS $projectCSS")->render());
+    HtmlRoot::$head->append(HtmlElement::Style("$tailwindCSS $projectCSS"));
 
     // Require PHP components
     require './public/portfolio/php/navbar.php';
     require './public/portfolio/php/finder.php';
     require './public/portfolio/php/file_tree.php';
+    require './public/portfolio/php/input.php';
 
     // Initialize highlight library
     $body = HtmlElement::Body()
@@ -165,28 +179,30 @@ class Portfolio extends Controller
             redirectButton(['interpret' => 'false'], 'Show file', ['download', 'download_all']),
             redirectButton(['download' => 'true'], 'Download file'),
             redirectButton(['download_all' => 'true'], 'Download all files'),
-            postButton('Create File In This File Folder', '/', [
+            postButton('Create File', '/', [
               'path' => "$pathForCreateFile/", 'unit' => $unit, 'exercise' => $exercise
             ], "true"),
-            new HtmlElement('input', ['id' => 'inputFolder', 'type' => 'text', 'value' => 'Write/Folder'], ''),
+            input([
+              'id' => 'inputFolder',
+              'type' => 'text',
+              'value' => "$pathForCreateFile",
+              'placeholder' => 'Write some valid path here...'
+            ]),
           ]));
         }
       }
       $body->append($container);
     }
-
-    // Add the body into the DOM
-    Html::append($body->render());
-
     // Finish adding the last Javascript components and dependencies
-    Html::append(HtmlElement::Script('hljs.initHighlightingOnLoad();')->render());
-    Html::append(HtmlElement::Javascript("./public/portfolio/js/add_redirects.js")->render());
-    Html::append(HtmlElement::Javascript("./public/portfolio/js/wrapper-php.js")->render());
-    Html::append(HtmlElement::Javascript("./public/portfolio/js/folder.js")->render());
-    Html::append(HtmlElement::Javascript("./public/portfolio/js/post_input.js")->render());
-
+    $body->append(HtmlElement::Script('hljs.initHighlightingOnLoad();'));
+    $body->append(HtmlElement::Javascript("./public/portfolio/js/add_redirects.js"));
+    $body->append(HtmlElement::Javascript("./public/portfolio/js/wrapper-php.js"));
+    $body->append(HtmlElement::Javascript("./public/portfolio/js/folder.js"));
+    $body->append(HtmlElement::Javascript("./public/portfolio/js/post_input.js"));
+    // Add the body into the DOM
+    HtmlRoot::append($body);
     // Tell the framework that we finished rendering HTML
-    Html::finish();
+    HtmlRoot::end();
   }
 }
 
