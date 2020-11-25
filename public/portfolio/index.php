@@ -2,7 +2,7 @@
 
 class Portfolio extends Controller
 {
-  private $maximumUploadSize = 10485760;
+  private $maximumUploadSize = 10485760; // 10MB
 
   function mkdir()
   {
@@ -40,7 +40,6 @@ class Portfolio extends Controller
       "./public/portfolio/exercises/$unit/$exercise/$path{$file["name"]}"
     );
     App::json(['success' => true]);
-    require './public/portfolio/php/upload.php';
   }
 
   function downloadZip()
@@ -96,7 +95,9 @@ class Portfolio extends Controller
     HtmlRoot::prep(['//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/default.min.css']);
     $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
     $projectCSS = file_get_contents('./public/portfolio/css/style.css');
-    HtmlRoot::$head->append(HtmlElement::Style("$tailwindCSS $projectCSS"));
+    HtmlRoot::$head->append(
+      HtmlElement::Style("$tailwindCSS $projectCSS")
+    );
 
     // Require PHP components
     require './public/portfolio/php/navbar.php';
@@ -104,7 +105,7 @@ class Portfolio extends Controller
     require './public/portfolio/php/file_tree.php';
     require './public/portfolio/php/input.php';
 
-    // Initialize highlight library
+    // Initialize highlight library and append nav
     $body = HtmlElement::Body()
       ->append(
         HtmlElement::Javascript(
@@ -117,10 +118,10 @@ class Portfolio extends Controller
     $hasExercise = isset($query_params['exercise']);
     // Check if we want to show units/exercise fileFolder
     if ($hasUnit && $hasExercise) {
-      // Get all the files in a bit data structure like a tree
+      // Get all the files in a data structure like a tree
       $tree = getAllFilesExercise($query_params['unit'], $query_params['exercise']);
 
-      // Showcase the tree in the DOM
+      // Get the tree element 
       $treeNode = showTree($tree);
 
       // Create a container so we get a GRID

@@ -54,17 +54,21 @@ class TestController extends Controller
         App::json(['success' => 'yes', 'sent' => App::body(true)]);
     }
 }
+
+// Initialize app
 $app = new App();
 $controller = new TestController("/");
-// /path/damn should override /path/*any
-$controller->get("/path/damn", ["prepend", "test", "test", "append"]);
+// /path/to should override /path/*any
+$controller->get("/path/to", ["prepend", "test", "test", "append"]);
 // /path/*any/*any
-$controller->get("/path/:damn/:xd", ["test_params"]);
+$controller->get("/path/:cool_parameter_1/:cool_parameter_2", ["test_params"]);
 // This should be /path/*any
-$controller->get("/path/:damn", ["test_params"]);
-// This should be path /path/*any/heee. SHOULD override /path/*any/*any
-$controller->get("/path/:damn/heee", ["test_params"]);
+$controller->get("/path/:any_parameter", ["test_params"]);
+// This should be path /path/*any/eee. SHOULD override /path/*any/*any
+$controller->get("/path/:parameter/eee", ["test_params"]);
+// Also you can do the same but with POST requests
 $controller->post("/path", ["postHandler"]);
+
 class ExercisesController extends Controller
 {
     public function folderIndex()
@@ -124,7 +128,9 @@ $controller_exercise->get("/:id", ['open_file']);
 $app->use($controller);
 $app->use($controller_exercise);
 require './public/portfolio/index.php';
+require './public/db_test/index.php';
 $app->use($controller_portfolio);
+$app->use($db_test_controller);
 $app->run();
 ?>
 
