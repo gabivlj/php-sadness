@@ -1,11 +1,29 @@
 
 <?php
 
+class Name
+{
+  public $name;
+  function __construct($query)
+  {
+    $this->name = $query;
+  }
+}
+
+class QueryOptions
+{
+  static $DEBUG_QUERIES = false;
+}
+
 function processValueType($value)
 {
+
   $type = gettype($value);
   if ($type == "string") return "'$value'";
   if ($type == "integer" || $type == "float") return $value;
+  if (get_class($value) == 'Name') {
+    return $value->name;
+  }
   throw new Exception("ERROR: Unknown type :(");
 }
 
@@ -14,6 +32,9 @@ class Where
 
   function keyValue($keyValue)
   {
+    if (gettype($keyValue) == "object" && get_class($keyValue) == "Where") {
+      return "($keyValue->cond)";
+    }
     foreach ($keyValue as $key => $value) {
       $value = processValueType($value);
       return "$key$value";
@@ -29,11 +50,13 @@ class Where
   function And($more)
   {
     $this->cond .= "&&" . $this->keyValue($more);
+    return $this;
   }
 
   function Or($more)
   {
     $this->cond .= "||" . $this->keyValue($more);
+    return $this;
   }
 }
 
@@ -70,7 +93,9 @@ class QueryOptionInsert
     $valKeys .= ')';
     $valValues .= ')';
     $str = "INSERT INTO {$this->model} $valKeys VALUES $valValues";
-    echo $str;
+    if (QueryOptions::$DEBUG_QUERIES) {
+      echo $str;
+    }
 
     return $this->parent->processQuery($str);;
   }
@@ -108,8 +133,10 @@ class QueryOptionSelect
     return $this;
   }
 
-  function Join()
+  function Join($toJoin, $where)
   {
+    $where = new Where($where);
+    $this->join = "JOIN $toJoin ON {$where->cond}";
     return $this;
   }
 
@@ -142,9 +169,21 @@ class QueryOptionSelect
     $joinedTables = join(", ", $this->tables);
     $where = $this->getWhere();
     $limit = $this->getLimit();
-    $str = "{$this->stmt} {$this->returns} FROM {$joinedTables} {$where} {$this->orderBy} $limit";
-    echo $str;
+    $join = $this->getJoin();
+    $str = "{$this->stmt} {$this->returns} FROM {$joinedTables} {$join} {$where} {$this->orderBy} $limit";
+    if (QueryOptions::$DEBUG_QUERIES) {
+      echo $str;
+    }
+    // echo $str;
     return $this->parent->processQuery($str);
+  }
+
+  private function getJoin()
+  {
+    if ($this->join === null) {
+      return '';
+    }
+    return "{$this->join}";
   }
 
   private function getLimit()
@@ -178,7 +217,13 @@ class Model
 
   function Select($returns = '*')
   {
-    return new QueryOptionSelect($this, "SELECT", [$this->name], $returns);
+
+    return new QueryOptionSelect(
+      $this,
+      "SELECT",
+      gettype($this->name) === 'string' ? [$this->name] : $this->name,
+      $returns
+    );
   }
 
   function Create($object)
@@ -198,12 +243,17 @@ class Model
 
   function processQuery(string $query)
   {
-    $rows = [];
-    $res = Model::$sqli->query($query);
-    $ok = Model::forEachRow($res, function ($row) use (&$rows) {
-      array_push($rows, $row);
-    });
-    if (!$ok) return false;
-    return $rows;
+    try {
+      $rows = [];
+      $res = Model::$sqli->query($query);
+      $ok = Model::forEachRow($res, function ($row) use (&$rows) {
+        array_push($rows, $row);
+      });
+      if (!$ok) return false;
+      return $rows;
+    } catch (Exception $_) {
+      echo "EXCEPTION";
+      return false;
+    }
   }
 }

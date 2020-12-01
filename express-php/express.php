@@ -250,7 +250,7 @@ class App
     {
         $entityBody = file_get_contents('php://input');
         if ($json) {
-            $entityBody = json_decode($entityBody);
+            $entityBody = json_decode($entityBody, true);
         }
         return $entityBody;
     }
