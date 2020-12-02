@@ -179,7 +179,7 @@ class QueryOptionInsert
   }
 }
 
-class QueryOptionSelect
+class QueryOptionNonInsert
 {
   public  $stmt;
 
@@ -192,9 +192,14 @@ class QueryOptionSelect
     $this->where = null;
     $this->join = null;
     $this->tables = $tables;
+    // Parent is the Model class
     $this->parent = $parent;
+    // Returns is the values to map to in SELECT
     $this->returns = $returns;
+    // Order by string
     $this->orderBy = '';
+    // Set object is the update values of UPDATE
+    $this->setParameters = '';
     $this->params = [];
   }
 
@@ -207,6 +212,8 @@ class QueryOptionSelect
    * 
    * If you use this on Joins dynamic params won't work and you have to use new Name
    * ("hardcore_value")
+   * 
+   * Available Ops: [Select, Delete, Update]
    */
   function Where($condition)
   {
@@ -218,6 +225,8 @@ class QueryOptionSelect
   /**
    * 
    * equivalent to `..stmt.. LIMIT $number`
+   * 
+   * Available Ops: [SELECT]
    */
   function Limit(int $number)
   {
@@ -229,6 +238,8 @@ class QueryOptionSelect
    * Does a Join with the Where parameters you pass
    * 
    * @@ WARNING: Be careful, you cannot do procedural bind params with JOINs... At least not at the * @@ moment, so if you are a hardcore guy and wanna use manual strings, use Name class
+   * 
+   * Available Ops: [SELECT]
    */
   function Join($toJoin, $where)
   {
@@ -239,10 +250,14 @@ class QueryOptionSelect
 
   /**
    * Finishes the query
+   * 
+   * Available Ops: [Select, Delete, Update]
    */
   function Do()
   {
-    if ($this->stmt == "SELECT") return $this->DoSelect();
+    if ($this->stmt == "SELECT" || $this->stmt == "DELETE" || $this->stmt == "UPDATE")
+      return $this->finish();
+    throw new Exception("unkown statement {$this->stmt}... not doing any query");
     return "";
   }
 
@@ -256,7 +271,33 @@ class QueryOptionSelect
   }
 
   /**
+   * Sets the update values of the desired object
+   * 
+   * Available Ops = [Update]
+   */
+  function Set(array $setObject)
+  {
+
+    $setParameters = "";
+    foreach ($setObject as $key => $value) {
+      $valueUpdated = processValueType($value);
+      if ($valueUpdated == '?') {
+        $this->params[] = [getSqlType($value), $value];
+      }
+      if (strlen($setParameters) > 0) $setParameters .= ",";
+      $setParameters .= "$key=$valueUpdated";
+    }
+    $this->setParameters = $setParameters;
+    // $setParameters .= "";
+    return $this;
+  }
+
+  /**
    * Or. Can be passed a Where class as well.
+   * 
+   * A where must be initialized!!
+   * 
+   * Available Ops: [Select, Delete, Update]
    */
   function Or(array $condition)
   {
@@ -266,6 +307,8 @@ class QueryOptionSelect
 
   /**
    * Pass the SQL stmt to do an orderBy like `table.createdAt DESC`
+   * 
+   * Available Ops: [SELECT]
    */
   function OrderBy(string $orderBy)
   {
@@ -273,7 +316,7 @@ class QueryOptionSelect
     return $this;
   }
 
-  private function DoSelect()
+  private function finish()
   {
     $joinedTables = join(", ", $this->tables);
     // Order here matters, where goes later on
@@ -284,11 +327,35 @@ class QueryOptionSelect
 
     $limit = $this->getLimit();
 
-    $str = "{$this->stmt} {$this->returns} FROM {$joinedTables} {$join} {$where} {$this->orderBy} $limit";
+    $union = $this->getSqlUnion();
+
+    $extra = $this->getSetIfNecessary();
+
+    $str = "{$this->stmt} {$this->returns} $union {$joinedTables} {$extra} {$join} {$where} {$this->orderBy} $limit";
     if (QueryOptions::$DEBUG_QUERIES) {
       echo $str;
     }
     return $this->parent->processQuery($str, $this->params);
+  }
+
+  private function getSetIfNecessary()
+  {
+    if ($this->stmt != "UPDATE") return "";
+    return "SET {$this->setParameters}";
+  }
+
+  /**
+   * Returns `FROM` depending on the internal statement
+   */
+  private function getSqlUnion()
+  {
+    if ($this->stmt == "SELECT" || $this->stmt == "DELETE") {
+      return "FROM";
+    }
+    if ($this->stmt == "INSERT" || $this->stmt == "UPDATE") {
+      return "";
+    }
+    throw new Exception("UNKOWN STATEMENT {$this->stmt}");
   }
 
   private function getJoin()
@@ -344,11 +411,42 @@ class Model
    */
   function Select($returns = '*')
   {
-    return new QueryOptionSelect(
+    return new QueryOptionNonInsert(
       $this,
       "SELECT",
       gettype($this->name) === 'string' ? [$this->name] : $this->name,
       $returns
+    );
+  }
+
+
+  /**
+   * Does a standard DELETE on the desired table
+   * 
+   * You can pass a String with comma divided values with the values that you want.
+   */
+  function Delete()
+  {
+    return new QueryOptionNonInsert(
+      $this,
+      "DELETE",
+      gettype($this->name) === 'string' ? [$this->name] : $this->name,
+      ''
+    );
+  }
+
+  /**
+   * Does a standard DELETE on the desired table
+   * 
+   * You can pass a String with comma divided values with the values that you want.
+   */
+  function Update()
+  {
+    return new QueryOptionNonInsert(
+      $this,
+      "UPDATE",
+      gettype($this->name) === 'string' ? [$this->name] : $this->name,
+      ''
     );
   }
 
@@ -383,7 +481,9 @@ class Model
     try {
       $rows = [];
       $stmt = Model::$sqli->prepare($query);
-
+      if (!$stmt) {
+        return false;
+      }
       $s = "";
       $arr = [];
       foreach ($params as $_ => $value) {

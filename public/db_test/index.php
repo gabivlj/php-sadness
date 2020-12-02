@@ -17,11 +17,21 @@ class Handlers extends Controller
     // append div for later
     HtmlRoot::append($div);
 
-    // Get most recent users and that have a student status
-    $whereJoin = new Where(['students.name=' => new Name('user.username')]);
+    // Examples
     $model = new Model(["user"]);
+    $delete = new Model('user');
+    $update = new Model('user');
+    $delete->Delete()->Where(['user.username=' => 'AASDADFSDFXXXxz'])->Do();
+    $update
+      ->Update()
+      ->Where(['user.username=' => 'AASDADFSDFXXX'])
+      ->Set(['createdAt' => 20201202165849])->Do();
+    $whereJoin = new Where(['students.name=' => new Name('user.username')]);
     $users = $model
-      ->Select('user.username, user.createdAt')->Where(['user.createdAt>' => 1])
+      ->Select('user.username, user.createdAt')
+      ->Where(['user.createdAt>' => 1])
+      // We can see here the join, even with a Where class, take place
+      // ->Join('students', $whereJoin)
       // ->And(['students.name=' => new Name('user.username')])
       ->Limit(3)
       ->OrderBy("user.createdAt DESC")
