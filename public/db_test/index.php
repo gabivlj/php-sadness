@@ -7,7 +7,7 @@ class Handlers extends Controller
   function test()
   {
     // Prints the queries that we are making on debug
-    QueryOptions::$DEBUG_QUERIES = true;
+    QueryOptions::$DEBUG_QUERIES = false;
 
     // Nothing to prepare for, just raw html 
     HtmlRoot::prep([]);
@@ -25,7 +25,7 @@ class Handlers extends Controller
       // as we can see, you can add where inside a where condition and 
       // the ORM will parse it as a (...whereConditions && (...whereConditions))
       // so you can chain
-      ->Join("students", $whereJoin->And($whereJoin))
+      ->Join("students", $whereJoin->And(new Where(['students.name=' => new Name("'aaazzz'")])))
       ->Where(['user.createdAt>' => 1])
       // ->And(['students.name=' => new Name('user.username')])
       ->Limit(3)
