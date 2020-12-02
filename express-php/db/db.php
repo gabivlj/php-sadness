@@ -183,7 +183,7 @@ class QueryOptionSelect
 {
   public  $stmt;
 
-  protected Where $where;
+  protected $where;
 
   function __construct($parent, $stmt, $tables = [], $returns = '*')
   {

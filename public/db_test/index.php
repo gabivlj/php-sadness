@@ -21,12 +21,7 @@ class Handlers extends Controller
     $whereJoin = new Where(['students.name=' => new Name('user.username')]);
     $model = new Model(["user"]);
     $users = $model
-      ->Select('user.username, user.createdAt')
-      // as we can see, you can add where inside a where condition and 
-      // the ORM will parse it as a (...whereConditions && (...whereConditions))
-      // so you can chain
-      ->Join("students", $whereJoin->And(new Where(['students.name=' => new Name("'aaazzz'")])))
-      ->Where(['user.createdAt>' => 1])
+      ->Select('user.username, user.createdAt')->Where(['user.createdAt>' => 1])
       // ->And(['students.name=' => new Name('user.username')])
       ->Limit(3)
       ->OrderBy("user.createdAt DESC")
