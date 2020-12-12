@@ -198,6 +198,34 @@ class App
     public static $query = null;
     public static $uri_params = [];
 
+    /**
+     * 
+     * Returns the base URI of host
+     */
+    public static function get_host()
+    {
+        return $_SERVER['HTTP_HOST'];
+    }
+
+    /**
+     * 
+     * Returns 'http' or 'https'
+     */
+    public static function get_protocol()
+    {
+        if (
+            isset($_SERVER['HTTPS']) &&
+            ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) ||
+            isset($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
+            $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https'
+        ) {
+            $protocol = 'https';
+        } else {
+            $protocol = 'http';
+        }
+        return $protocol;
+    }
+
     public static function get_file($key)
     {
         if (!isset($_FILES[$key])) {
