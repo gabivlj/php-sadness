@@ -131,6 +131,8 @@ require './public/portfolio/index.php';
 require './public/db_test/index.php';
 $app->use($controller_portfolio);
 $app->use($db_test_controller);
+require './public/ecommerce/controllers/index.php';
+startEcommerce($app);
 $app->run();
 ?>
 

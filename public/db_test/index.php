@@ -25,7 +25,8 @@ class Handlers extends Controller
     $update
       ->Update()
       ->Where(['user.username=' => 'AASDADFSDFXXX'])
-      ->Set(['createdAt' => 20201202165849])->Do();
+      ->Set(['createdAt' => 20201202165849])
+      ->Do();
     $whereJoin = new Where(['students.name=' => new Name('user.username')]);
     $users = $model
       ->Select('user.username, user.createdAt')
