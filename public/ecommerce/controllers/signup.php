@@ -10,23 +10,44 @@ class Signup extends Controller
   static function init()
   {
     Signup::$instance = new Signup("/sign_up");
-    Signup::$instance->post("/register", ['register']);
-    Signup::$instance->get("/register", ['register_html']);
-    Signup::$instance->get("/login", ['login_html']);
-    Signup::$instance->post("/login", ['login']);
-    Signup::$instance->post("/verification", ['verify']);
-    Signup::$instance->get("/verification", ['verification_html']);
-    Signup::$instance->get("/test/:username/:email", ['test']);
+    Signup::$instance->post("/register", ['middleware_redirect', 'register']);
+    Signup::$instance->get("/register", ['middleware_redirect', 'register_html']);
+    Signup::$instance->get("/login", ['middleware_redirect', 'login_html']);
+    Signup::$instance->post("/login", ['middleware_redirect', 'login']);
+    Signup::$instance->post("/verification", ['middleware_redirect', 'verify']);
+    Signup::$instance->get("/verification", ['middleware_redirect', 'verification_html']);
   }
 
-  function test()
+  function middleware_redirect()
   {
-    $user = User::exists(App::$uri_params['username'], App::$uri_params['email']);
-    if ($user == null) {
-      App::status_code(404);
-      return App::json(['error' => 'User of specified id not found']);
+    session_start();
+    if (isset($_SESSION['id'])) {
+      App::set_response_header('location', '/home');
+      $this->stop();
     }
-    App::json(['user' => $user]);
+  }
+
+  /**
+   * POST request
+   * @body [email, password]
+   * @response 200 success otherwise it's bad. Returns the user in "user" json and a message which  * is "Success!"
+   */
+  function login()
+  {
+    $body = App::body(true);
+    $email = $body['email'];
+    $password = $body['password'];
+    $user = User::checkPassword($email, $password);
+    if (!$user) {
+      App::status_code(400);
+      App::json(['message' => 'Invalid credentials']);
+      return;
+    }
+    session_start();
+    $_SESSION['email'] =  $user['email'];
+    $_SESSION['id'] =  $user['id'];
+    $_SESSION['username'] =  $user['username'];
+    App::json(['user' => $user, 'message' => 'Success!', 'redirect' => '/home']);
   }
 
   /**
@@ -40,9 +61,24 @@ class Signup extends Controller
     $username = $body['username'];
     $email = $body['email'];
     $password = $body['password'];
+    $error = null;
+    if (strlen($username) < 4 || strlen($username) > 16) {
+      $error = "Username should be atleast between 4 and 16 characters";
+    }
+    if (strlen($email) < 4 || strlen($email) > 128) {
+      $error = "Enter a valid email";
+    }
+    if (strlen($password) < 4) {
+      $error = "Password is too short";
+    }
+    if ($error) {
+      App::status_code(400);
+      App::json(['message' => $error]);
+      return;
+    }
     if (User::exists($username, $email)) {
       App::status_code(400);
-      App::json(['message' => 'user already exists!']);
+      App::json(['message' => 'User already exists!']);
       return;
     }
     $response = User::createUser($username, $password, $email);
@@ -50,11 +86,11 @@ class Signup extends Controller
     $protocol = App::get_protocol();
     if (!sendEmail($email, $username, "Dear $username,<br>please, verify your email clicking in this link: $protocol://$hostname/sign_up/verification?e=$email&t=$response")) {
       App::status_code(400);
-      App::json(['message' => 'Email verification is not working! TODO: Reset user data']);
+      App::json(['message' => 'Email verification is not working!']);
       return;
     }
     App::status_code(200);
-    App::json(['message' => 'Starting email verification!']);
+    App::json(['message' => 'Starting email verification!', 'redirect' => '/sign_up/login']);
   }
 
   /**
@@ -79,7 +115,7 @@ class Signup extends Controller
 
   function verification_html()
   {
-    HtmlRoot::prep(['//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.3.1/styles/default.min.css']);
+    HtmlRoot::prep([]);
     $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
     HtmlRoot::$head->append(
       HtmlElement::Style("$tailwindCSS")
@@ -95,6 +131,41 @@ class Signup extends Controller
     } else {
       Verification::view($query['e'], $query['t']);
     }
+    HtmlRoot::end();
+  }
+
+  function register_html()
+  {
+    HtmlRoot::prep([]);
+    $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
+    HtmlRoot::$head->append(
+      HtmlElement::Style("$tailwindCSS")
+    );
+
+    require_once './public/ecommerce/views/navbar.php';
+    HtmlRoot::append(
+      HtmlElement::Body()
+        ->append(navBarUnverified())
+        ->append(HtmlElement::raw(file_get_contents("./public/ecommerce/html/register.html")))
+    );
+    HtmlRoot::append(HtmlElement::Javascript("/public/ecommerce/js/form_log.js"));
+    HtmlRoot::end();
+  }
+
+  function login_html()
+  {
+    HtmlRoot::prep([]);
+    $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
+    HtmlRoot::$head->append(
+      HtmlElement::Style("$tailwindCSS")
+    );
+    require_once './public/ecommerce/views/navbar.php';
+    HtmlRoot::append(
+      HtmlElement::Body()
+        ->append(navBarUnverified())
+        ->append(HtmlElement::raw(file_get_contents("./public/ecommerce/html/login.html")))
+    );
+    HtmlRoot::append(HtmlElement::Javascript("/public/ecommerce/js/form_log.js"));
     HtmlRoot::end();
   }
 }

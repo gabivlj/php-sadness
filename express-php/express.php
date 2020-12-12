@@ -23,6 +23,14 @@ class HtmlElement
         $this->tag = $tag;
         $this->atts = $atts;
         $this->content = $content;
+        $this->raw = false;
+    }
+
+    static function raw($raw)
+    {
+        $el = new HtmlElement("", [], $raw);
+        $el->raw = true;
+        return $el;
     }
 
     static function Style($content)
@@ -49,6 +57,9 @@ class HtmlElement
     {
 
         $s = "";
+        if ($this->raw) {
+            return $this->content;
+        }
         if (is_string($this->content)) {
             $s = $this->content;
         } else {

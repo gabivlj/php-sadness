@@ -18,6 +18,25 @@ class User
     return gettype($rows) === 'array' && count($rows) > 0;
   }
 
+  static function checkPassword($email, $password)
+  {
+    $repository = new Model("users");
+    $rows = $repository
+      ->Select("email, verified, salt, password, id, username")
+      ->Where(['email=' => $email])
+      ->Limit(1)
+      ->Do();
+    if (gettype($rows) != 'array' || count($rows) == 0) {
+      return false;
+    }
+    $user = $rows[0];
+    $passwordHash = password_hash($password, PASSWORD_BCRYPT, ['salt' => $user['salt']]);
+    if ($passwordHash !== $user['password']) {
+      return false;
+    }
+    return ['email' => $user['email'], 'username' => $user['username'], 'id' => $user['id']];
+  }
+
   /**
    * returns user by id
    * 
