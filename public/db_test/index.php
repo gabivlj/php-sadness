@@ -7,7 +7,7 @@ class Handlers extends Controller
   function test()
   {
     // Prints the queries that we are making on debug
-    QueryOptions::$DEBUG_QUERIES = false;
+    QueryOptions::$DEBUG_QUERIES = true;
 
     // Nothing to prepare for, just raw html 
     HtmlRoot::prep([]);
@@ -21,20 +21,22 @@ class Handlers extends Controller
     $model = new Model(["user"]);
     $delete = new Model('user');
     $update = new Model('user');
-    $delete->Delete()->Where(['user.username=' => 'AASDADFSDFXXXxz'])->Do();
-    $update
-      ->Update()
-      ->Where(['user.username=' => 'AASDADFSDFXXX'])
-      ->Set(['createdAt' => 20201202165849])
-      ->Do();
+    // $delete->Delete()->Where(['user.username=' => 'AASDADFSDFXXXxz'])->Do();
+    // $update
+    //   ->Update()
+    //   ->Where(['user.username=' => 'AASDADFSDFXXX'])
+    //   ->Set(['createdAt' => 20201202165849])
+    //   ->Do();
+    $w = new Where(['teacher.name=' => new Name('user.username')]);
     $whereJoin = new Where(['students.name=' => new Name('user.username')]);
+    $comeTogether = new Where(['students.id>=' => 0]);
+    $comeTogether = $comeTogether->Or(['teacher.id>' => 1]);
     $users = $model
       ->Select('user.username, user.createdAt')
-      ->Where(['user.createdAt>' => 1])
-      // We can see here the join, even with a Where class, take place
-      // ->Join('students', $whereJoin)
-      // ->And(['students.name=' => new Name('user.username')])
-      ->Limit(3)
+      ->Where($comeTogether)
+      ->And(['user.createdAt>' => 1])
+      ->LOJoin('teacher', $w)
+      ->LOJoin('students', $whereJoin)
       ->OrderBy("user.createdAt DESC")
       ->Do();
 
@@ -73,7 +75,7 @@ class Handlers extends Controller
       'password' => $body['password'],
       'id' => $this->create_id(),
     ])->Do();
-    $studentsModel = new Model('students');
+    $studentsModel = new Model('teacher');
     if ($ok === false) {
       App::status_code(400);
       App::json(['success' => false, 'data' => null]);
@@ -96,7 +98,7 @@ class Handlers extends Controller
 
   function create_id(): string
   {
-    require './express-php/uuid.php';
+    require_once './express-php/uuid.php';
     return UUID::v4();
   }
 }

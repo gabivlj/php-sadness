@@ -190,7 +190,7 @@ class QueryOptionNonInsert
     $this->stmt = $stmt;
     $this->limit = null;
     $this->where = null;
-    $this->join = null;
+    $this->join = [];
     $this->tables = $tables;
     // Parent is the Model class
     $this->parent = $parent;
@@ -241,11 +241,22 @@ class QueryOptionNonInsert
    * 
    * Available Ops: [SELECT]
    */
-  function Join($toJoin, $where)
+  function Join($toJoin, $where, $type = "JOIN")
   {
     $where = new Where($where);
-    $this->join = new SafeQuery("JOIN $toJoin ON {$where->cond}", $where->query);
+    $this->join[] = new SafeQuery("$type $toJoin ON {$where->cond}", $where->query);
+
     return $this;
+  }
+
+  function LOJoin($toJoin, $where)
+  {
+    return $this->Join($toJoin, $where, "LEFT OUTER JOIN");
+  }
+
+  function InnerJoin($toJoin, $where)
+  {
+    return $this->Join($toJoin, $where, "INNER JOIN");
   }
 
   /**
@@ -363,9 +374,14 @@ class QueryOptionNonInsert
     if ($this->join === null) {
       return '';
     }
-    // Concatenate current procedural params with the join ones !!!
-    $this->params = concat($this->params, $this->join->keys);
-    return "{$this->join->stmt}";
+    $stmt = "";
+    foreach ($this->join as $join) {
+      // Concatenate current procedural params with the join ones !!!
+      $this->params = concat($this->params, $join->keys);
+      $stmt .= $join->stmt;
+      $stmt .= " ";
+    }
+    return $stmt;
   }
 
   private function getLimit()
@@ -399,7 +415,7 @@ class Model
   function __construct($name)
   {
     if (Model::$sqli == null)
-      Model::$sqli = mysqli_connect("192.168.64.2", "gabi", "123456", "ecommerce");
+      Model::$sqli = mysqli_connect("192.168.64.2", "gabi", "123456", "apiTest"); //ecommerce
     $this->name = $name;
   }
 
