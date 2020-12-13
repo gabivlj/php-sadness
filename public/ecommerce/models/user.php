@@ -56,6 +56,36 @@ class User
     return $rows[0];
   }
 
+  static function updatePassword($token, $password, $email)
+  {
+    $repo = new Model("users");
+    $salt = random_bytes(24);
+    $passwordHash = password_hash($password, PASSWORD_BCRYPT, ['salt' => $salt]);
+    $res = $repo
+      ->Update()
+      ->Where(['confirmation_token=' => $token])
+      ->And(['email=' => $email])
+      ->Set(['password' => $passwordHash, 'salt' => $salt, 'confirmation_token' => ''])
+      ->Do();
+    return !!$res;
+  }
+
+  static function generateGetBackToken($email)
+  {
+    if (!User::exists("", $email)) {
+      return false;
+    }
+    $repo = new Model("users");
+    $token = UUID::v4();
+    $res = $repo
+      ->Update()
+      ->Where(['email=' => $email])
+      ->Set(['confirmation_token' => $token])
+      ->Do();
+    if (!$res) return false;
+    return $token;
+  }
+
   static function confirmUser($email, $token)
   {
     $repository = new Model("users");
@@ -113,19 +143,5 @@ class User
       return false;
     }
     return $confirmationToken;
-  }
-
-  /**
-   * Verifies user's mail
-   */
-  static function verifyUser($email, $verificationToken)
-  {
-  }
-
-  /**
-   * returns the loged user. if failed returns null.
-   */
-  static function logUser($email, $password)
-  {
   }
 }

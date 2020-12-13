@@ -415,7 +415,7 @@ class Model
   function __construct($name)
   {
     if (Model::$sqli == null)
-      Model::$sqli = mysqli_connect("192.168.64.2", "gabi", "123456", "apiTest"); //ecommerce
+      Model::$sqli = mysqli_connect("192.168.64.2", "gabi", "123456", "ecommerce"); //ecommerce
     $this->name = $name;
   }
 

@@ -14,7 +14,7 @@ document.getElementById('submit').addEventListener('click', e => {
     .map(input => [input.attributes.name.value, input.value])
     .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
   fetch(
-    `${window.location.protocol}//${window.location.hostname}${path.value}`,
+    `${window.location.protocol}//${window.location.hostname}${path.value}${window.location.search}`,
     {
       method: 'POST',
       headers: {
@@ -35,8 +35,12 @@ document.getElementById('submit').addEventListener('click', e => {
         errorLabel.innerHTML = res.message;
         loadingLabel.classList.add('invisible');
         errorLabel.classList.remove('invisible');
-      } else {
+      } else if (res.redirect != null) {
         window.location.href = res.redirect;
+      } else {
+        errorLabel.innerHTML = res.message;
+        errorLabel.classList.remove('invisible');
+        loadingLabel.classList.add('invisible');
       }
       loading = false;
     })

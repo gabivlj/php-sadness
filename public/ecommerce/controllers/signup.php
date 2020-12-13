@@ -16,6 +16,10 @@ class Signup extends Controller
     Signup::$instance->post("/login", ['middleware_redirect', 'login']);
     Signup::$instance->post("/verification", ['middleware_redirect', 'verify']);
     Signup::$instance->get("/verification", ['middleware_redirect', 'verification_html']);
+    Signup::$instance->get("/forgot", ['middleware_redirect', 'forgot_html']);
+    Signup::$instance->post("/forgot", ['middleware_redirect', 'forgot']);
+    Signup::$instance->post("/forgot/password", ['middleware_redirect', 'forgot_password']);
+    Signup::$instance->get("/forgot/password", ['middleware_redirect', 'forgot_password_html']);
   }
 
   function middleware_redirect()
@@ -25,6 +29,37 @@ class Signup extends Controller
       App::set_response_header('location', '/home');
       $this->stop();
     }
+  }
+
+  function forgot_password()
+  {
+    $query = App::query_params();
+    if (!isset($query['e']) || !isset($query['t'])) {
+      App::status_code(400);
+      App::json(['message' => 'Invalid credentials']);
+      return;
+    }
+    $email = $query['e'];
+    $token = $query['t'];
+    $body = App::body(true);
+    if (!isset($body['password'])) {
+      App::status_code(400);
+      App::json(['message' => 'Invalid credentials']);
+      return;
+    }
+    if (strlen($body['password']) < 6) {
+      App::status_code(400);
+      App::json(['message' => 'Password must be more or equal than 6 characters']);
+      return;
+    }
+    $res = User::updatePassword($token, $body['password'], $email);
+    if (!$res) {
+
+      App::status_code(400);
+      App::json(['message' => 'Invalid credentials']);
+      return;
+    }
+    App::json(['message' => 'Success!', 'redirect' => '/sign_up/login']);
   }
 
   /**
@@ -43,7 +78,7 @@ class Signup extends Controller
       App::json(['message' => 'Invalid credentials']);
       return;
     }
-    session_start();
+    // no need to start again a session, we started it on the middleware 
     $_SESSION['email'] =  $user['email'];
     $_SESSION['id'] =  $user['id'];
     $_SESSION['username'] =  $user['username'];
@@ -93,6 +128,31 @@ class Signup extends Controller
     App::json(['message' => 'Starting email verification!', 'redirect' => '/sign_up/login']);
   }
 
+  function forgot()
+  {
+    $body = App::body(true);
+    $email = $body['email'];
+    $token = User::generateGetBackToken($email);
+    if (!$token) {
+      App::status_code(400);
+      App::json(['message' => 'Insert a good email!']);
+      return;
+    }
+    $hostname = App::get_host();
+    $protocol = App::get_protocol();
+    if (!sendEmail(
+      $email,
+      "",
+      "Dear user,<br>please, change your credentials here: $protocol://$hostname/sign_up/forgot/password?e=$email&t=$token"
+    )) {
+      App::status_code(400);
+      App::json(['message' => 'Email verification is not working!']);
+      return;
+    }
+    App::status_code(200);
+    App::json(['message' => "You got an email on $email!"]);
+  }
+
   /**
    * POST request
    * @body [token, email]
@@ -136,23 +196,25 @@ class Signup extends Controller
 
   function register_html()
   {
-    HtmlRoot::prep([]);
-    $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
-    HtmlRoot::$head->append(
-      HtmlElement::Style("$tailwindCSS")
-    );
+    $this->render_form("./public/ecommerce/html/register.html");
+  }
 
-    require_once './public/ecommerce/views/navbar.php';
-    HtmlRoot::append(
-      HtmlElement::Body()
-        ->append(navBarUnverified())
-        ->append(HtmlElement::raw(file_get_contents("./public/ecommerce/html/register.html")))
-    );
-    HtmlRoot::append(HtmlElement::Javascript("/public/ecommerce/js/form_log.js"));
-    HtmlRoot::end();
+  function forgot_html()
+  {
+    $this->render_form("./public/ecommerce/html/forgot.html");
+  }
+
+  function forgot_password_html()
+  {
+    $this->render_form("./public/ecommerce/html/get_back_password.html");
   }
 
   function login_html()
+  {
+    $this->render_form("/public/ecommerce/html/login.html");
+  }
+
+  function render_form($html_path)
   {
     HtmlRoot::prep([]);
     $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
@@ -163,7 +225,7 @@ class Signup extends Controller
     HtmlRoot::append(
       HtmlElement::Body()
         ->append(navBarUnverified())
-        ->append(HtmlElement::raw(file_get_contents("./public/ecommerce/html/login.html")))
+        ->append(HtmlElement::raw(file_get_contents($html_path)))
     );
     HtmlRoot::append(HtmlElement::Javascript("/public/ecommerce/js/form_log.js"));
     HtmlRoot::end();

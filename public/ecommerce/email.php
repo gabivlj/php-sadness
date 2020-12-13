@@ -9,7 +9,7 @@ require_once './public/ecommerce/dependencies/PHPMailer/src/PHPMailer.php';
 require_once './public/ecommerce/dependencies/PHPMailer/src/SMTP.php';
 
 require_once './public/ecommerce/config.php';
-function sendEmail($email, $username, $text)
+function sendEmail($email, $username = '', $text = '')
 {
 
   // Instantiation and passing `true` enables exceptions
