@@ -18,7 +18,12 @@ class Items extends Controller
     $ins = new Items("/items");
     Items::$instance = $ins;
     $ins->get("/admin/:type", ['fill_admin', 'get_items']);
+    $ins->get("/admin/:type/:id", ['fill_admin', 'get_item']);
     $ins->post("/admin/:type", ['fill_admin', 'post_item']);
+  }
+
+  function get_item()
+  {
   }
 
   function post_item()
@@ -80,7 +85,7 @@ class Items extends Controller
         return;
       }
     }
-    echo 'OK';
+    App::set_response_header('location', "/items/admin/$type");
   }
 
   function get_items()
@@ -96,7 +101,7 @@ class Items extends Controller
     if (Items::$available_types[$type]) {
       $rows = $itemsType
         ->Select('*')
-        ->InnerJoin('items', ['items.id_ext=' => "$type.id"])
+        ->InnerJoin('items', ['items.id_ext=' => new Name("$type.id")])
         ->Do();
       // this means that it's not an item that should be bought
     } else {
