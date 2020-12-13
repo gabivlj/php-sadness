@@ -46,7 +46,7 @@ class User
   {
     $repository = new Model("users");
     $rows = $repository
-      ->Select("username, email, id")
+      ->Select("username, email, id, admin")
       ->Where(['id=' => $id])
       ->Limit(1)
       ->Do();

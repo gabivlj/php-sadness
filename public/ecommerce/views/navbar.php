@@ -48,7 +48,20 @@ function navBarUnverified()
     ['link' => '/sign_up/register', 'text' => 'Register'],
     ['link' => '/products', 'text' => 'All Products'],
     ['link' => '/products?type=cds', 'text' => 'CDs/Vynils'],
-    ['link' => '/products?type=cassete', 'text' => 'Cassettes'],
+    ['link' => '/products?type=headset', 'text' => 'Headsets'],
     ['link' => '/products?type=player', 'text' => 'Players'],
+  ]);
+}
+
+function navBarVerified($username)
+{
+  return nav([
+    ['link' => '/home', 'text' => 'Home'],
+    ['link' => '/products', 'text' => 'All Products'],
+    ['link' => '/products?type=cds', 'text' => 'CDs/Vynils'],
+    ['link' => '/products?type=headsets', 'text' => 'Headsets'],
+    ['link' => '/products?type=players', 'text' => 'Players'],
+    ['link' => '/sign_up/logout', 'text' => 'Logout'],
+    ['link' => "/user/$username", 'text' => $username],
   ]);
 }

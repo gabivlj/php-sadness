@@ -219,7 +219,7 @@ class Signup extends Controller
     HtmlRoot::prep([]);
     $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
     HtmlRoot::$head->append(
-      HtmlElement::Style("$tailwindCSS")
+      HtmlElement::Style($tailwindCSS)
     );
     require_once './public/ecommerce/views/navbar.php';
     HtmlRoot::append(

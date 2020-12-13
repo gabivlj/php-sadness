@@ -507,7 +507,8 @@ class Model
         $arr[] = $value[1];
       }
       $params = array_merge([$s], $arr);
-      call_user_func_array(array($stmt, 'bind_param'), refValues($params));
+      if (count($arr) > 0)
+        call_user_func_array(array($stmt, 'bind_param'), refValues($params));
       // TODO : HANDLE ERROR AND RETURN A CLASS Result CONTAINING EVERYTHING
       $okExecute = $stmt->execute();
       if (!$okExecute) {
