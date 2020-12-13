@@ -27,7 +27,7 @@ class Form
       ));
     }
     $form->append(new HtmlElement('input', ['type' => 'file', 'name' => 'file']));
-    $form->append(new HtmlElement('input', ['type' => 'submit', 'value' => $buttonTitle, 'class' => 'm-3 p-3']));
+    $form->append(new HtmlElement('input', ['type' => 'submit', 'value' => $buttonTitle, 'class' => 'm-3 p-3 cursor-pointer']));
     return $form;
   }
 }

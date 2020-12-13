@@ -33,6 +33,50 @@ class Items extends Controller
     $ins->post("/admin/:type", ['fill_admin', 'post_item']);
   }
 
+  function delete_item()
+  {
+    // QueryOptions::$DEBUG_QUERIES = true;
+    $uriParams = App::$uri_params;
+    $id = $uriParams['id'];
+    $type = $uriParams['type'];
+    if (!isset(Items::$available_types[$type])) {
+      $this->render("./public/ecommerce/html/not_found.html");
+      return;
+    }
+    if (Items::$available_types[$type]) {
+      $model = new Model("items");
+      $ok = $model
+        ->Delete()
+        ->Where(['id_ext=' => $id])
+        ->Do();
+      if (!$ok) {
+        $this->render("./public/ecommerce/html/not_found.html");
+        return;
+      }
+    }
+    if (Items::$available_image_types[$type]) {
+      $model = new Model("image");
+      $ok = $model
+        ->Delete()
+        ->Where(['item_id=' => $id])
+        ->Do();
+      if (!$ok) {
+        $this->render("./public/ecommerce/html/not_found.html");
+        return;
+      }
+    }
+    $model = new Model($type);
+    $ok = $model
+      ->Delete()
+      ->Where(['id=' => $id])
+      ->Do();
+    if (!$ok) {
+      $this->render("./public/ecommerce/html/not_found.html");
+      return;
+    }
+    App::set_response_header('location', "/items/admin/$type");
+  }
+
   function update_item()
   {
     unset($_POST['id']);
@@ -105,6 +149,7 @@ class Items extends Controller
   {
     require_once './public/ecommerce/views/table.php';
     require_once './public/ecommerce/views/form.php';
+    require_once './public/ecommerce/views/delete_button.php';
     $uriParams = App::$uri_params;
     $id = $uriParams['id'];
     $type = $uriParams['type'];
@@ -151,6 +196,7 @@ class Items extends Controller
       }
     }
     $root->append((new Table($rows, $type))->render());
+    $root->append((new DeleteButton())->render("/items/admin/delete/$type/$id"));
     $this->render_view($root);
   }
 
