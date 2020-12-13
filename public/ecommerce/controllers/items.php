@@ -140,9 +140,10 @@ class Items extends Controller
         $this->render("./public/ecommerce/html/not_found.html");
         return;
       }
-      App::set_response_header('location', "/items/admin/$type/$id");
+
       return;
     }
+    App::set_response_header('location', "/items/admin/$type/$id");
   }
 
   function get_item()
