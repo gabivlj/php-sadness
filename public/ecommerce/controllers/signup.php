@@ -79,9 +79,9 @@ class Signup extends Controller
       return;
     }
     // no need to start again a session, we started it on the middleware 
-    $_SESSION['email'] =  $user['email'];
-    $_SESSION['id'] =  $user['id'];
-    $_SESSION['username'] =  $user['username'];
+    $_SESSION['email'] = $user['email'];
+    $_SESSION['id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
     App::json(['user' => $user, 'message' => 'Success!', 'redirect' => '/home']);
   }
 
@@ -211,7 +211,7 @@ class Signup extends Controller
 
   function login_html()
   {
-    $this->render_form("/public/ecommerce/html/login.html");
+    $this->render_form("./public/ecommerce/html/login.html");
   }
 
   function render_form($html_path)
