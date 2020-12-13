@@ -5,6 +5,7 @@ RewriteCond %{REQUEST_URI} !^/blob
 RewriteCond %{REQUEST_URI} !^/public/portfolio/js
 RewriteCond %{REQUEST_URI} !^/public/ecommerce/js
 RewriteCond %{REQUEST_URI} !^/public/ecommerce/local
+RewriteCond %{REQUEST_URI} !^/public/ecommerce/files
 RewriteCond %{REQUEST_URI} !^/exam_1
 RewriteCond %{REQUEST_URI} !^/phpmyadmin
 ErrorDocument 404 /index.php
