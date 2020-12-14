@@ -9,8 +9,10 @@ class Shop extends Controller
     $ins = new Shop("/shop");
     Shop::$instance = $ins;
     $ins->post("/cart/:item_id", ['fill_user', 'post_item']);
+    // TODO:
     $ins->post("/fulfill", ['fill_user', 'fulfill_order']);
     $ins->post("/cart/remove/:item_id", ['fill_user', 'remove_item']);
+    // TODO:
     $ins->get("/cart", ['fill_user', 'get_cart_items']);
     $ins->get("/:type/:id", ['fill_user', 'get_item']);
   }

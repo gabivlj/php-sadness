@@ -40,11 +40,17 @@ class ItemView
       if (strpos($key, "id") !== false)
         continue;
       $container->append(
-        new HtmlElement('h1', ['class' => 'font-bold text-xl text-gray-900 mt-5'], [ucfirst($key)])
+        new HtmlElement(
+          'h1',
+          ['class' => 'font-bold text-xl text-gray-900 mt-5'],
+          [str_replace("_", " ", ucfirst($key))]
+        )
       );
+      $value = ucfirst($value);
       if ($key === "price") {
         $value = "$value $";
       }
+
       $container->append(
         new HtmlElement('h1', ['class' => 'text-xl text-gray-900 m-3'], "$value")
       );
