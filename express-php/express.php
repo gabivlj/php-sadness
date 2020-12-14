@@ -285,8 +285,11 @@ class App
         echo $data;
     }
 
-    public static function body($json = false)
+    public static function body($json = false, $multipart = false)
     {
+        if ($multipart) {
+            return $_POST;
+        }
         $entityBody = file_get_contents('php://input');
         if ($json) {
             $entityBody = json_decode($entityBody, true);

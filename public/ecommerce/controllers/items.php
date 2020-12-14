@@ -11,6 +11,7 @@ class Items extends Controller
     'artists' => false,
     'users' => false,
     'images' => false,
+    'items' => false,
   ];
   static $available_image_types = [
     'albums' => true,
@@ -19,6 +20,7 @@ class Items extends Controller
     'artists' => true,
     'users' => false,
     'images' => false,
+    'items' => false,
   ];
   static $user = [];
 
@@ -155,7 +157,7 @@ class Items extends Controller
     $id = $uriParams['id'];
     $type = $uriParams['type'];
     if (!isset(Items::$available_types[$type])) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     $model = new Model($type);
@@ -198,7 +200,7 @@ class Items extends Controller
     }
     $root->append((new Table($rows, $type))->render());
     $root->append((new DeleteButton())->render("/items/admin/delete/$type/$id"));
-    $this->render_view($root);
+    Items::render_view($root);
   }
 
   function post_item()
@@ -206,12 +208,12 @@ class Items extends Controller
     $params = App::$uri_params;
     $type = $params['type'];
     if (!isset(Items::$available_types[$type])) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     $file = App::get_file('file');
     if ($file == null) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     if ($file['size'] > 10000000) {
@@ -238,13 +240,13 @@ class Items extends Controller
       ->Create($data)
       ->Do();
     if (!$ok) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     $model = new Model("image");
     $ok = $model->Create(['table_id' => $type, 'item_id' => $id, 'id' => $fileId])->Do();
     if (!$ok) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     if (Items::$available_types[$type]) {
@@ -256,7 +258,7 @@ class Items extends Controller
         'type' => $type
       ])->Do();
       if (!$ok) {
-        $this->render("./public/ecommerce/html/not_found.html");
+        Items::render("./public/ecommerce/html/not_found.html");
         return;
       }
     }
@@ -268,7 +270,7 @@ class Items extends Controller
     $params = App::$uri_params;
     $type = $params['type'];
     if (!isset(Items::$available_types[$type])) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     $itemsType = new Model($type);
@@ -285,7 +287,7 @@ class Items extends Controller
         ->Do();
     }
     if ($rows === false) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     require_once './public/ecommerce/views/table.php';
@@ -309,7 +311,7 @@ class Items extends Controller
       ['class' => 'container'],
       [$table->render(), $form ? $form->render() : '']
     );
-    $this->render_view($root);
+    Items::render_view($root);
   }
 
   function column_types($type)
@@ -344,7 +346,7 @@ class Items extends Controller
   }
 
 
-  function render_view($view)
+  static function render_view($view)
   {
     HtmlRoot::prep([]);
     $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
@@ -360,7 +362,7 @@ class Items extends Controller
     HtmlRoot::end();
   }
 
-  function render($html_path)
+  static function render($html_path)
   {
     HtmlRoot::prep([]);
     $tailwindCSS = file_get_contents("./public/portfolio/css/main.css");
