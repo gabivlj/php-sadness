@@ -4,6 +4,15 @@
 class Shop extends Controller
 {
   static $instance;
+
+  static $SELECT_ATTRIBUTES_ALL = 'DISTINCT cart_item.item_id, cart_item.id as cart_item_id, headset.name as headset_name, players.name as players_name, albums.name as albums_name, image.id as image_id, cart_item.quantity as quantity, items.type as type, items.price as price';
+
+  static $product_types = [
+    'headset' => true,
+    'players' => true,
+    'albums' => true,
+  ];
+
   static function init()
   {
     $ins = new Shop("/shop");
@@ -15,6 +24,32 @@ class Shop extends Controller
     // TODO:
     $ins->get("/cart", ['fill_user', 'get_cart_items']);
     $ins->get("/:type/:id", ['fill_user', 'get_item']);
+  }
+
+  function fulfill_order()
+  {
+  }
+
+  function get_cart_items()
+  {
+    // QueryOptions::$DEBUG_QUERIES = true;
+    $id = Items::$user['id'];
+    $cart = new Model('cart_item');
+    $cart = $cart
+      ->Select(Shop::$SELECT_ATTRIBUTES_ALL)
+      ->Where(['user_id=' => $id]);
+    foreach (Shop::$product_types as $product => $_) {
+      $cart->LOJoin($product, ["$product.id=" => new Name('cart_item.item_id')]);
+    }
+    $cart->LOJoin("items", ["items.id_ext=" => new Name('cart_item.item_id')]);
+    $cart = $cart
+      ->Join('image', ['image.item_id=' => new Name('cart_item.item_id')])
+      ->GroupBy("cart_item.item_id");
+    $items = $cart->Do();
+    // echo "<pre>", var_dump($items), "</pre>";
+    require_once './public/ecommerce/views/cart_list.php';
+    $cartList = new CartList($items);
+    Items::render_view($cartList->render());
   }
 
   function remove_item()
@@ -55,7 +90,12 @@ class Shop extends Controller
     if (!$ok) {
       App::set_response_header('location', "/shop/{$item['type']}/{$itemID}?error=3");
     } else {
-      App::set_response_header('location', "/shop/{$item['type']}/{$itemID}");
+      // If we can redirect to previous page, do it.
+      if (isset($_SERVER["HTTP_REFERER"])) {
+        App::set_response_header("Location: ", $_SERVER["HTTP_REFERER"]);
+      } else {
+        App::set_response_header('location', "/shop/{$item['type']}/{$itemID}");
+      }
     }
   }
 
@@ -74,7 +114,7 @@ class Shop extends Controller
 
     if ($type === 'albums') {
       $items = $items
-        ->Select('albums.id as id, albums.name as name, artists.name as artist, items.price as price, items.quantity as quantity')
+        ->Select('albums.id as id, albums.name as name, artists.name as artist, items.price as price, items.quantity as quantity, albums.genre')
         ->Where(['albums.id=' => $id])
         ->InnerJoin('items', ['items.id_ext=' => new Name("$type.id")]);
       $items->LOJoin('artists', ['artists.id=' => new Name('albums.artist_id')]);

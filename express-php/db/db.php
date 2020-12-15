@@ -187,6 +187,7 @@ class QueryOptionNonInsert
 
   function __construct($parent, $stmt, $tables = [], $returns = '*')
   {
+    $this->groupBy = '';
     $this->stmt = $stmt;
     $this->limit = null;
     $this->where = null;
@@ -201,6 +202,12 @@ class QueryOptionNonInsert
     // Set object is the update values of UPDATE
     $this->setParameters = '';
     $this->params = [];
+  }
+
+  function GroupBy($att)
+  {
+    $this->groupBy = "GROUP BY $att";
+    return $this;
   }
 
   /**
@@ -342,7 +349,9 @@ class QueryOptionNonInsert
 
     $extra = $this->getSetIfNecessary();
 
-    $str = "{$this->stmt} {$this->returns} $union {$joinedTables} {$extra} {$join} {$where} {$this->orderBy} $limit";
+    $groupBy = $this->groupBy;
+
+    $str = "{$this->stmt} {$this->returns} $union {$joinedTables} {$extra} {$join} {$where} {$this->orderBy} $groupBy $limit";
     if (QueryOptions::$DEBUG_QUERIES) {
       echo $str;
     }
