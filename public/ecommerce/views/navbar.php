@@ -61,6 +61,7 @@ function navBarVerified($username)
     ['link' => '/products?type=cds', 'text' => 'CDs/Vynils'],
     ['link' => '/products?type=headsets', 'text' => 'Headsets'],
     ['link' => '/products?type=players', 'text' => 'Players'],
+    ['link' => '/shop/cart', 'text' => 'Shopcart'],
     ['link' => '/sign_up/logout', 'text' => 'Logout'],
     ['link' => "/user/$username", 'text' => $username],
   ]);

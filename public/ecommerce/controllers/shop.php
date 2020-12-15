@@ -18,8 +18,7 @@ class Shop extends Controller
     $ins = new Shop("/shop");
     Shop::$instance = $ins;
     $ins->post("/cart/:item_id", ['fill_user', 'post_item']);
-    // TODO:
-    $ins->post("/fulfill", ['fill_user', 'fulfill_order']);
+    $ins->post("/cart/fulfill", ['fill_user', 'fulfill_order']);
     $ins->post("/cart/remove/:item_id", ['fill_user', 'remove_item']);
     // TODO:
     $ins->get("/cart", ['fill_user', 'get_cart_items']);
@@ -28,11 +27,49 @@ class Shop extends Controller
 
   function fulfill_order()
   {
+    // QueryOptions::$DEBUG_QUERIES = true;
+    $cart = new Model('cart_item');
+    $id = Items::$user['id'];
+    $rows = $cart
+      ->Select('items.id_ext as item_id, cart_item.quantity as quantity, items.price as price')
+      ->Join('items', ['items.id_ext=' => new Name('cart_item.item_id')])
+      ->Where(['cart_item.user_id=' => $id])
+      ->Do();;
+    $cart = new Model('cart_item');
+    $ok = $cart->Delete()->Where(['cart_item.user_id='  => $id])->Do();
+    if ($ok === false) {
+      Items::render("./public/ecommerce/html/not_found.html");
+      return;
+    }
+    $orderId = UUID::v4();
+    if (!(new Model('orders'))->Create([
+      'id' => $orderId,
+      'user_id' => $id,
+      'date' => time(),
+      'status' => 'PROC',
+    ])->Do()) {
+      Items::render("./public/ecommerce/html/not_found.html");
+      return;
+    }
+    foreach ($rows as $item) {
+      $orderItem = new Model('order_item');
+      $ok = $orderItem->Create([
+        'order_id' => $orderId,
+        'item_id' => $item['item_id'],
+        'quantity' => $item['quantity'],
+        'original_price' => $item['price'],
+      ])->Do();
+      if (!$ok) {
+        Items::render("./public/ecommerce/html/not_found.html");
+        return;
+      }
+    }
+    App::set_response_header('location', '/shop/cart');
   }
 
   function get_cart_items()
   {
-    // QueryOptions::$DEBUG_QUERIES = true;
+
     $id = Items::$user['id'];
     $cart = new Model('cart_item');
     $cart = $cart

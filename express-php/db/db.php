@@ -507,6 +507,8 @@ class Model
       $rows = [];
       $stmt = Model::$sqli->prepare($query);
       if (!$stmt) {
+        if (QueryOptions::$DEBUG_QUERIES)
+          echo Model::$sqli->error;
         return false;
       }
       $s = "";
@@ -521,6 +523,8 @@ class Model
       // TODO : HANDLE ERROR AND RETURN A CLASS Result CONTAINING EVERYTHING
       $okExecute = $stmt->execute();
       if (!$okExecute) {
+        if (QueryOptions::$DEBUG_QUERIES)
+          echo $stmt->error;
         return $okExecute;
       }
       $res = $stmt->get_result();
