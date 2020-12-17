@@ -7,8 +7,10 @@ class Order extends Controller
   {
     $ins = new Order("/orders");
     Order::$instance = $ins;
+    $ins->get("/admin", ['fill_admin', 'get_orders']);
     $ins->get("/admin/:user_id", ['fill_admin', 'get_orders']);
     $ins->get("/admin/order/:id", ['fill_admin', 'get_order']);
+    // DEPRECATED: Just using items.php
     $ins->post("/admin/update/:type/:id", ['fill_admin', 'update_order']);
   }
 
@@ -41,9 +43,14 @@ class Order extends Controller
       Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
+
     require_once './public/ecommerce/views/table.php';
     $table = new Table($rows, 'orders');
-    Items::render_view(new HtmlElement('div', [], [$table->render()]));
+    Items::render_view(new HtmlElement(
+      'div',
+      [],
+      [new HtmlElement('h1', ['class' => 'm-3 p-3 text-3xl'], "Orders made by user $userID"), $table->render()]
+    ));
   }
 
   function get_order()

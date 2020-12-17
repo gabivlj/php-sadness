@@ -12,6 +12,7 @@ class Items extends Controller
     'users' => false,
     'images' => false,
     'items' => false,
+    'orders' => false,
   ];
   static $available_image_types = [
     'albums' => true,
@@ -21,6 +22,7 @@ class Items extends Controller
     'users' => false,
     'images' => false,
     'items' => false,
+    'orders' => false,
   ];
   static $user = [];
 

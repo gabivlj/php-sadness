@@ -43,11 +43,11 @@ function processValueType($value)
 {
   $type = gettype($value);
   if ($type == "string") return "?";
-  if ($type == "integer" || $type == "float") return "?";
+  if ($type == "integer" || $type == "float" || $type == "double") return "?";
   if (get_class($value) == 'Name') {
     return $value->name;
   }
-  throw new Exception("ERROR: Unknown type :(");
+  throw new Exception("ERROR: Unknown type :( $type");
 }
 
 function getSqlType($value)
@@ -59,6 +59,10 @@ function getSqlType($value)
     return "i";
   }
   if (gettype($value) == "double") {
+    return "d";
+  }
+
+  if (gettype($value) == "float") {
     return "d";
   }
 

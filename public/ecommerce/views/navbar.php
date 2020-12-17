@@ -53,9 +53,11 @@ function navBarUnverified()
   ]);
 }
 
+
+
 function navBarVerified($username)
 {
-  return nav([
+  $links = [
     ['link' => '/home', 'text' => 'Home'],
     ['link' => '/products', 'text' => 'All Products'],
     ['link' => '/products?type=cds', 'text' => 'CDs/Vynils'],
@@ -64,5 +66,13 @@ function navBarVerified($username)
     ['link' => '/shop/cart', 'text' => 'Shopcart'],
     ['link' => '/sign_up/logout', 'text' => 'Logout'],
     ['link' => "/user/$username", 'text' => $username],
-  ]);
+  ];
+  require_once './public/ecommerce/controllers/items.php';
+  if (isset(Items::$user['admin']) && Items::$user['admin']) {
+    $links[] = ['link' => '/items/admin/orders', 'text' => 'OrdersDash'];
+    $links[] = ['link' => '/items/admin/albums', 'text' => 'AlbumsDash'];
+    $links[] = ['link' => '/items/admin/headset', 'text' => 'HeadsetDash'];
+    $links[] = ['link' => '/items/admin/players', 'text' => 'PlayersDash'];
+  }
+  return nav($links);
 }

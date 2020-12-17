@@ -15,11 +15,21 @@ class Signup extends Controller
     Signup::$instance->get("/login", ['middleware_redirect', 'login_html']);
     Signup::$instance->post("/login", ['middleware_redirect', 'login']);
     Signup::$instance->post("/verification", ['middleware_redirect', 'verify']);
+    Signup::$instance->get("/logout", ['logout']);
     Signup::$instance->get("/verification", ['middleware_redirect', 'verification_html']);
     Signup::$instance->get("/forgot", ['middleware_redirect', 'forgot_html']);
     Signup::$instance->post("/forgot", ['middleware_redirect', 'forgot']);
     Signup::$instance->post("/forgot/password", ['middleware_redirect', 'forgot_password']);
     Signup::$instance->get("/forgot/password", ['middleware_redirect', 'forgot_password_html']);
+  }
+
+  function logout()
+  {
+    session_start();
+    $_SESSION = [];
+    setcookie(session_name(), '', time() - 10000000, '/');
+    session_destroy();
+    App::set_response_header('location', '/sign_up/login');
   }
 
   function middleware_redirect()

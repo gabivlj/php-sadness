@@ -6,3 +6,5 @@
 **/config.php
 **/dependencies
 **/generator.php
+**/dataset
+**/files
