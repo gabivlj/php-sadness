@@ -9,9 +9,11 @@ class Order extends Controller
     Order::$instance = $ins;
     $ins->get("/admin", ['fill_admin', 'get_orders']);
     $ins->get("/admin/:user_id", ['fill_admin', 'get_orders']);
-    $ins->get("/admin/order/:id", ['fill_admin', 'get_order']);
-    // DEPRECATED: Just using items.php
-    $ins->post("/admin/update/:type/:id", ['fill_admin', 'update_order']);
+    $ins->get("/admin/orders/:id", ['fill_admin', 'get_order']);
+    // todo:
+    $ins->post("/admin/update/:id", ['fill_admin', 'update_order']);
+    // todo:
+    $ins->post("/admin/delete/:id", ['fill_admin', 'delete_order']);
   }
 
   function fill_admin()
@@ -33,12 +35,14 @@ class Order extends Controller
 
   function get_orders()
   {
-    $userID = App::$uri_params['user_id'];
+    $userID = isset(App::$uri_params['user_id']) ? App::$uri_params['user_id'] : null;
     $order = new Model('orders');
-    $rows = $order
-      ->Select('*')
-      ->Where(['user_id=' => $userID])
-      ->Do();
+    $order = $order
+      ->Select('*');
+    if ($userID) {
+      $order->Where(['user_id=' => $userID]);
+    }
+    $rows = $order->Do();
     if ($rows === false) {
       Items::render("./public/ecommerce/html/not_found.html");
       return;
@@ -49,12 +53,14 @@ class Order extends Controller
     Items::render_view(new HtmlElement(
       'div',
       [],
-      [new HtmlElement('h1', ['class' => 'm-3 p-3 text-3xl'], "Orders made by user $userID"), $table->render()]
+      [new HtmlElement('h1', ['class' => 'm-3 p-3 text-3xl'], $userID ? "Orders made by user $userID" : 'Orders'), $table->render('/orders/admin')]
     ));
   }
 
   function get_order()
   {
+    require_once './public/ecommerce/views/table.php';
+    require_once './public/ecommerce/views/delete_button.php';
     $orderID = App::$uri_params['id'];
     $order = new Model('orders');
     $rows = $order
@@ -68,13 +74,17 @@ class Order extends Controller
     $order = $rows[0];
     $items = new Model('order_item');
     $itemRows = $items
-      ->Select('*')
-      ->InnerJoin('items', ['id=' => new Name('order_item.item_id')])
+      ->Select('order_item.order_id, items.type as type, order_item.quantity as quantity, items.price as price, order_item.original_price as original_price, items.id_ext as id')
+      ->InnerJoin('items', ['id_ext=' => new Name('order_item.item_id')])
       ->Where(['order_id=' => $orderID])
       ->Do();
     $table = new Table($rows, 'orders');
-    $tableItems = new Table($itemRows, 'items');
-    $root = new HtmlElement('div', [], [$table->render(), $tableItems->render()]);
+    $tableItems = new Table($itemRows, null);
+    $root = new HtmlElement('div', [], [
+      $table->render(),
+      $tableItems->render(),
+      // (new DeleteButton())->render("/orders/admin/delete/{$order['id']}")
+    ]);
     Items::render_view($root);
   }
 }

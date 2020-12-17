@@ -69,10 +69,11 @@ function navBarVerified($username)
   ];
   require_once './public/ecommerce/controllers/items.php';
   if (isset(Items::$user['admin']) && Items::$user['admin']) {
-    $links[] = ['link' => '/items/admin/orders', 'text' => 'OrdersDash'];
-    $links[] = ['link' => '/items/admin/albums', 'text' => 'AlbumsDash'];
-    $links[] = ['link' => '/items/admin/headset', 'text' => 'HeadsetDash'];
-    $links[] = ['link' => '/items/admin/players', 'text' => 'PlayersDash'];
+    $links[] = ['link' => '/orders/admin', 'text' => 'OrdersDash'];
+    $links[] = ['link' => '/items/admin/albums', 'text' => 'Albums Dash'];
+    $links[] = ['link' => '/items/admin/headset', 'text' => 'Headset Dash'];
+    $links[] = ['link' => '/items/admin/players', 'text' => 'Players Dash'];
+    $links[] = ['link' => '/items/admin/users', 'text' => 'Users Dashboard'];
   }
   return nav($links);
 }

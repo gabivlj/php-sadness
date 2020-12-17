@@ -9,7 +9,7 @@ class Table
   }
 
 
-  function render()
+  function render($path = "/items/admin")
   {
     $root = new HtmlElement('div', ['class' => 'mt-3 overflow-x-auto bg-white rounded-lg shadow overflow-y-auto relative'], []);
     if (count($this->table) == 0) {
@@ -26,17 +26,18 @@ class Table
     $root->append($table);
     $t = $this;
     $idx = 0;
-    $trows = array_map(function ($el) use ($t, &$idx) {
+    $trows = array_map(function ($el) use ($t, &$idx, $path) {
       $idx += 1;
-      return new HtmlElement('tr', [], array_map(function ($el) use ($t, $idx) {
+      return new HtmlElement('tr', [], array_map(function ($str) use ($t, $idx, $path, $el) {
+        $type = $t->type ? $t->type : $el['type'];
         return new HtmlElement('td', ['class' => 'border-dashed border-t border-gray-200  '], [
           new HtmlElement(
-            isset($t->table[$idx - 1]['id']) && $t->table[$idx - 1]['id'] === $el ? 'a' : 'span',
+            isset($t->table[$idx - 1]['id']) && $t->table[$idx - 1]['id'] === $str ? 'a' : 'span',
             [
-              'href' => "/items/admin/{$t->type}/$el",
+              'href' => "$path/{$type}/$str",
               'class' => 'text-gray-700 px-6 py-3 flex items-center'
             ],
-            "$el"
+            "$str"
           )
         ]);
       }, $el));

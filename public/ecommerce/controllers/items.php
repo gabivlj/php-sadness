@@ -177,6 +177,10 @@ class Items extends Controller
       []
     );
     $rows = $query->Do();
+    if (!$rows) {
+      Items::render("./public/ecommerce/html/not_found.html");
+      return;
+    }
     // Map the values to something readable for Form class
     $columnTypes = $this->column_types($type);
     if ($type !== 'users') {
