@@ -54,7 +54,6 @@ function navBarUnverified()
 function navBarVerified($username)
 {
   $links = [
-    ['link' => '/home', 'text' => 'Home'],
     ['link' => '/search', 'text' => 'All Products'],
     ['link' => '/search/albums', 'text' => 'CDs/Vynils'],
     ['link' => '/search/headset', 'text' => 'Headsets'],
