@@ -194,7 +194,9 @@ class QueryOptionNonInsert
     $this->groupBy = '';
     $this->stmt = $stmt;
     $this->limit = null;
+    $this->range = null;
     $this->where = null;
+    $this->in = null;
     $this->join = [];
     $this->tables = $tables;
     // Parent is the Model class
@@ -206,6 +208,12 @@ class QueryOptionNonInsert
     // Set object is the update values of UPDATE
     $this->setParameters = '';
     $this->params = [];
+  }
+
+  function In(string $column, QueryOptionNonInsert $query)
+  {
+    $this->in = [$column, $query];
+    return $this;
   }
 
   function GroupBy($att)
@@ -239,9 +247,10 @@ class QueryOptionNonInsert
    * 
    * Available Ops: [SELECT]
    */
-  function Limit(int $number)
+  function Limit(int $number, $range = null)
   {
     $this->limit = $number;
+    $this->range = $range;
     return $this;
   }
 
@@ -338,7 +347,7 @@ class QueryOptionNonInsert
     return $this;
   }
 
-  private function finish()
+  private function finish($execute = true)
   {
     $joinedTables = join(", ", $this->tables);
     // Order here matters, where goes later on
@@ -353,13 +362,38 @@ class QueryOptionNonInsert
 
     $extra = $this->getSetIfNecessary();
 
+    $in = $this->getIn($where);
+
     $groupBy = $this->groupBy;
 
-    $str = "{$this->stmt} {$this->returns} $union {$joinedTables} {$extra} {$join} {$where} {$this->orderBy} $groupBy $limit";
-    if (QueryOptions::$DEBUG_QUERIES) {
-      echo $str;
+    $str = "{$this->stmt} {$this->returns} $union {$joinedTables} {$extra} {$join} {$where} {$in} 
+    {$this->orderBy} $groupBy $limit";
+    if ($execute) {
+      if (QueryOptions::$DEBUG_QUERIES) {
+        echo $str;
+      }
+
+      return $this->parent->processQuery($str, $this->params);
     }
-    return $this->parent->processQuery($str, $this->params);
+    return $str;
+  }
+
+  private function getIn($where)
+  {
+    if (!$this->in) return "";
+    $str = "";
+    if ($where === "") {
+      $str = "WHERE {$this->in[0]}";
+    } else {
+      $str = "&& {$this->in[0]}";
+    }
+    $query = $this->in[1]->finish(false);
+    $str .= " IN ($query)";
+    foreach ($this->in[1]->params as $param) {
+      $this->params[] = $param;
+    }
+
+    return $str;
   }
 
   private function getSetIfNecessary()
@@ -401,6 +435,9 @@ class QueryOptionNonInsert
   {
     if ($this->limit === null) {
       return '';
+    }
+    if ($this->range !== null) {
+      return "LIMIT {$this->limit}, {$this->range}";
     }
     return "LIMIT {$this->limit}";
   }

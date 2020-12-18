@@ -46,10 +46,10 @@ function navBarUnverified()
     ['link' => '/home', 'text' => 'Home'],
     ['link' => '/sign_up/login', 'text' => 'Login'],
     ['link' => '/sign_up/register', 'text' => 'Register'],
-    ['link' => '/products', 'text' => 'All Products'],
-    ['link' => '/products?type=cds', 'text' => 'CDs/Vynils'],
-    ['link' => '/products?type=headset', 'text' => 'Headsets'],
-    ['link' => '/products?type=player', 'text' => 'Players'],
+    ['link' => '/search', 'text' => 'All Products'],
+    ['link' => '/search/cds', 'text' => 'CDs/Vynils'],
+    ['link' => '/search/headset', 'text' => 'Headsets'],
+    ['link' => '/search/player', 'text' => 'Players'],
   ]);
 }
 
@@ -59,10 +59,10 @@ function navBarVerified($username)
 {
   $links = [
     ['link' => '/home', 'text' => 'Home'],
-    ['link' => '/products', 'text' => 'All Products'],
-    ['link' => '/products?type=cds', 'text' => 'CDs/Vynils'],
-    ['link' => '/products?type=headsets', 'text' => 'Headsets'],
-    ['link' => '/products?type=players', 'text' => 'Players'],
+    ['link' => '/search', 'text' => 'All Products'],
+    ['link' => '/search/cds', 'text' => 'CDs/Vynils'],
+    ['link' => '/search/headset', 'text' => 'Headsets'],
+    ['link' => '/search/players', 'text' => 'Players'],
     ['link' => '/shop/cart', 'text' => 'Shopcart'],
     ['link' => '/sign_up/logout', 'text' => 'Logout'],
     ['link' => "/user/$username", 'text' => $username],

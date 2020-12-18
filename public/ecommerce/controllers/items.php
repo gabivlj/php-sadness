@@ -44,7 +44,7 @@ class Items extends Controller
     $id = $uriParams['id'];
     $type = $uriParams['type'];
     if (!isset(Items::$available_types[$type])) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     if (Items::$available_types[$type]) {
@@ -54,7 +54,7 @@ class Items extends Controller
         ->Where(['id_ext=' => $id])
         ->Do();
       if (!$ok) {
-        $this->render("./public/ecommerce/html/not_found.html");
+        Items::render("./public/ecommerce/html/not_found.html");
         return;
       }
     }
@@ -65,7 +65,7 @@ class Items extends Controller
         ->Where(['item_id=' => $id])
         ->Do();
       if (!$ok) {
-        $this->render("./public/ecommerce/html/not_found.html");
+        Items::render("./public/ecommerce/html/not_found.html");
         return;
       }
     }
@@ -75,7 +75,7 @@ class Items extends Controller
       ->Where(['id=' => $id])
       ->Do();
     if (!$ok) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     App::set_response_header('location', "/items/admin/$type");
@@ -88,7 +88,7 @@ class Items extends Controller
     $id = $uriParams['id'];
     $type = $uriParams['type'];
     if (!isset(Items::$available_types[$type])) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      Items::render("./public/ecommerce/html/not_found.html");
       return;
     }
     $itemKeys = [];
@@ -111,7 +111,7 @@ class Items extends Controller
         ->Set($_POST)
         ->Do();
       if (!$ok) {
-        $this->render("./public/ecommerce/html/not_found.html");
+        Items::render("./public/ecommerce/html/not_found.html");
         return;
       }
     }
@@ -123,7 +123,7 @@ class Items extends Controller
         ->Set($itemKeys)
         ->Do();
       if (!$ok) {
-        $this->render("./public/ecommerce/html/not_found.html");
+        Items::render("./public/ecommerce/html/not_found.html");
         return;
       }
     }
@@ -141,7 +141,7 @@ class Items extends Controller
       $model = new Model("image");
       $ok = $model->Create(['table_id' => $type, 'item_id' => $id, 'id' => $fileId])->Do();
       if (!$ok) {
-        $this->render("./public/ecommerce/html/not_found.html");
+        Items::render("./public/ecommerce/html/not_found.html");
         return;
       }
 
