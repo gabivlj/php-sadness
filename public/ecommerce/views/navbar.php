@@ -46,10 +46,6 @@ function navBarUnverified()
     ['link' => '/home', 'text' => 'Home'],
     ['link' => '/sign_up/login', 'text' => 'Login'],
     ['link' => '/sign_up/register', 'text' => 'Register'],
-    ['link' => '/search', 'text' => 'All Products'],
-    ['link' => '/search/cds', 'text' => 'CDs/Vynils'],
-    ['link' => '/search/headset', 'text' => 'Headsets'],
-    ['link' => '/search/player', 'text' => 'Players'],
   ]);
 }
 
@@ -60,7 +56,7 @@ function navBarVerified($username)
   $links = [
     ['link' => '/home', 'text' => 'Home'],
     ['link' => '/search', 'text' => 'All Products'],
-    ['link' => '/search/cds', 'text' => 'CDs/Vynils'],
+    ['link' => '/search/albums', 'text' => 'CDs/Vynils'],
     ['link' => '/search/headset', 'text' => 'Headsets'],
     ['link' => '/search/players', 'text' => 'Players'],
     ['link' => '/shop/cart', 'text' => 'Shopcart'],

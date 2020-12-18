@@ -58,7 +58,7 @@ class Search extends Controller
     }
     $limit = isset($queryParams['limit']) ? $queryParams['limit'] : 10;
     $page = isset($queryParams['page']) ? $queryParams['page'] : 1;
-    $query->Limit(($page - 1) * $limit, ($limit * $page));
+    $query->Limit(($page - 1) * $limit, $limit);
     $query->InnerJoin('image', ['image.item_id=' => new Name('items.id_ext')]);
   }
 

@@ -1,0 +1,42 @@
+
+  <main class="my-8">
+   
+    <div class="container mx-auto px-6">
+        <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="text" placeholder="Headset name" name="name">
+        <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="text" placeholder="Brand" name="brand">
+      <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="number" placeholder="Rpm" name="rpm">
+
+      Bluetooth:
+      <select type="select" name="bluetooth" class="input">
+        <option value="1" >Yes</option>
+        <option value="0">No</option>
+        <option value="null" selected>Don't care</option>
+    </select>
+      <br>
+      <div class="mt-5"></div>
+      <select type="select" name="order_by" class="input">
+          <option value="default" selected>Default</option>
+          <option value="price_asc">Price Ascendent</option>
+          <option value="price_desc">Price Descendent</option>
+      </select>
+      <button class="p-2 rounded-full bg-blue-600 text-white mx-5  hover:bg-blue-500 focus:outline-none focus:bg-blue-500 mb-3" id="submit">
+          <svg class="h-5 w-5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"></path></svg>
+      </button>
+     
+        <h3 class="text-gray-700 text-2xl font-medium">Headsets</h3>
+        <span class="mt-3 text-sm text-gray-500">Products</span>
+        <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6" id="products">
+          
+        </div>
+        <div class="flex justify-center">
+            <div class="flex rounded-md mt-8">
+              <button class="py-2 px-4 leading-tight bg-white border border-gray-200 text-blue-700 border-r-0 ml-0 rounded-l hover:bg-blue-500 hover:text-white" id="previous"><span>Previous</span></button>                 
+              <button id="next" class="py-2 px-4 leading-tight bg-white border border-gray-200 text-blue-700 rounded-r hover:bg-blue-500 hover:text-white"><span>Next</span></button>
+                <!-- <a href="#" class="py-2 px-4 leading-tight bg-white border border-gray-200 text-blue-700 border-r-0 hover:bg-blue-500 hover:text-white"><span>1</span></a>
+                <a href="#" class="py-2 px-4 leading-tight bg-white border border-gray-200 text-blue-700 border-r-0 hover:bg-blue-500 hover:text-white"><span>2</span></a>
+                <a href="#" class="py-2 px-4 leading-tight bg-white border border-gray-200 text-blue-700 border-r-0 hover:bg-blue-500 hover:text-white"><span>3</span></a> -->
+            </div>
+        </div>
+    </div>
+</main>
+<script src="/public/ecommerce/js/retrieve_products.js"></script>
