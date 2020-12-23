@@ -7,6 +7,7 @@ class Order extends Controller
   {
     $ins = new Order("/orders");
     Order::$instance = $ins;
+    $ins->get("/user", ['fill_admin', 'get_orders']);
     $ins->get("/admin", ['fill_admin', 'get_orders']);
     $ins->get("/admin/:user_id", ['fill_admin', 'get_orders']);
     $ins->get("/admin/orders/:id", ['fill_admin', 'get_order']);
@@ -14,6 +15,18 @@ class Order extends Controller
     $ins->post("/admin/update/:id", ['fill_admin', 'update_order']);
     // todo:
     $ins->post("/admin/delete/:id", ['fill_admin', 'delete_order']);
+  }
+
+  function fill_user()
+  {
+    session_start();
+    if (!isset($_SESSION['id'])) {
+      App::set_response_header('location', '/sign_up/login');
+      $this->stop();
+      return;
+    }
+    $id = $_SESSION['id'];
+    Items::$user = User::getById($id);
   }
 
   function fill_admin()

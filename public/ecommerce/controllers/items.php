@@ -189,6 +189,8 @@ class Items extends Controller
         $columnTypes
       ), "/items/admin/update/$type/$id");
       $root->append($form->render('Update Item'));
+    } else {
+      $root->append(new HtmlElement('a', ['href' => "/orders/admin/{$id}", 'class' => 'underline font-bold text-blue-500 m-5 p-5'], "See {$rows[0]['username']} orders"));
     }
     if (Items::$available_image_types[$type]) {
       $images = (new Model('image'))
