@@ -1,6 +1,6 @@
 <?php
-
-class Order extends Controller
+require_once './public/ecommerce/controllers/auth.php';
+class Order extends Auth
 {
   static $instance;
   static function init()
@@ -17,35 +17,6 @@ class Order extends Controller
     $ins->post("/admin/delete/:id", ['fill_admin', 'delete_order']);
   }
 
-  function fill_user()
-  {
-    session_start();
-    if (!isset($_SESSION['id'])) {
-      App::set_response_header('location', '/sign_up/login');
-      $this->stop();
-      return;
-    }
-    $id = $_SESSION['id'];
-    Items::$user = User::getById($id);
-  }
-
-  function fill_admin()
-  {
-    session_start();
-    if (!isset($_SESSION['id'])) {
-      App::set_response_header('location', '/sign_up/login');
-      $this->stop();
-      return;
-    }
-    $id = $_SESSION['id'];
-    Items::$user = User::getById($id);
-    if (!Items::$user || !Items::$user['admin']) {
-      App::set_response_header('location', '/home');
-      $this->stop();
-      return;
-    }
-  }
-
   function get_orders()
   {
     $userID = isset(App::$uri_params['user_id']) ? App::$uri_params['user_id'] : null;
@@ -57,13 +28,13 @@ class Order extends Controller
     }
     $rows = $order->Do();
     if ($rows === false) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
 
     require_once './public/ecommerce/views/table.php';
     $table = new Table($rows, 'orders');
-    Items::render_view(new HtmlElement(
+    $this->render_view(new HtmlElement(
       'div',
       [],
       [new HtmlElement('h1', ['class' => 'm-3 p-3 text-3xl'], $userID ? "Orders made by user $userID" : 'Orders'), $table->render('/orders/admin')]
@@ -81,7 +52,7 @@ class Order extends Controller
       ->Where(['id=' => $orderID])
       ->Do();
     if (!$rows) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     $order = $rows[0];
@@ -98,6 +69,6 @@ class Order extends Controller
       $tableItems->render(),
       // (new DeleteButton())->render("/orders/admin/delete/{$order['id']}")
     ]);
-    Items::render_view($root);
+    $this->render_view($root);
   }
 }

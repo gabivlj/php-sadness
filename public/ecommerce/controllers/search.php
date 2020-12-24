@@ -1,6 +1,6 @@
 <?php
-
-class Search extends Controller
+require_once './public/ecommerce/controllers/auth.php';
+class Search extends Auth
 {
   static $selection_params = "items.id_ext as id, items.price as price, items.quantity as quantity, items.type as type, image.id as image_id";
   static $instance;
@@ -29,20 +29,7 @@ class Search extends Controller
   function find_products_html()
   {
     $type = App::$uri_params['type'];
-    Items::render("./public/ecommerce/html/products_$type.html");
-  }
-
-
-  function fill_user()
-  {
-    session_start();
-    if (!isset($_SESSION['id'])) {
-      App::set_response_header('location', '/sign_up/login');
-      $this->stop();
-      return;
-    }
-    $id = $_SESSION['id'];
-    Items::$user = User::getById($id);
+    $this->render("./public/ecommerce/html/products_$type.html");
   }
 
   function order_by_and_pagination(QueryOptionNonInsert $query, $queryParams)

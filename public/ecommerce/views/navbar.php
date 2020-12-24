@@ -51,7 +51,7 @@ function navBarUnverified()
 
 
 
-function navBarVerified($username)
+function navBarVerified($username, $admin)
 {
   $links = [
     ['link' => '/search', 'text' => 'All Products'],
@@ -63,7 +63,7 @@ function navBarVerified($username)
     ['link' => "/user/$username", 'text' => $username],
   ];
   require_once './public/ecommerce/controllers/items.php';
-  if (isset(Items::$user['admin']) && Items::$user['admin']) {
+  if ($admin) {
     $links[] = ['link' => '/orders/admin', 'text' => 'OrdersDash'];
     $links[] = ['link' => '/items/admin/albums', 'text' => 'Albums Dash'];
     $links[] = ['link' => '/items/admin/headset', 'text' => 'Headset Dash'];

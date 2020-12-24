@@ -342,7 +342,7 @@ class App
 
     public function use($controller)
     {
-        assert(get_parent_class($controller) == "Controller" || get_class($controller) == "Controller", "Type/Parent should be Controller type");
+        // assert(get_parent_class($controller) == "Controller" || get_class($controller) == "Controller", "Type/Parent should be Controller type");
         array_push($this->controllers, $controller);
     }
 

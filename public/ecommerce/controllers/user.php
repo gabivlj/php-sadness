@@ -1,6 +1,6 @@
 <?php
-
-class UserController extends Controller
+require_once './public/ecommerce/controllers/auth.php';
+class UserController extends Auth
 {
   static $instance = null;
 
@@ -10,18 +10,6 @@ class UserController extends Controller
     UserController::$instance = $ins;
     $ins->get("/:username", ['fill_user', 'get_user']);
     $ins->get("/order/:order_id", ['fill_user', 'get_user_order']);
-  }
-
-  function fill_user()
-  {
-    session_start();
-    if (!isset($_SESSION['id'])) {
-      App::set_response_header('location', '/sign_up/login');
-      $this->stop();
-      return;
-    }
-    $id = $_SESSION['id'];
-    Items::$user = User::getById($id);
   }
 
   function get_user_order()
@@ -35,13 +23,13 @@ class UserController extends Controller
       ->Where(['id=' => $orderID])
       ->Do();
     if (!$rows) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
 
     $order = $rows[0];
-    if ($order['user_id'] !== Items::$user['id']) {
-      Items::render("./public/ecommerce/html/not_found.html");
+    if ($order['user_id'] !== $this->user['id']) {
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     unset($rows[0]['user_id']);
@@ -58,7 +46,7 @@ class UserController extends Controller
       $tableItems->render(),
       // (new DeleteButton())->render("/orders/admin/delete/{$order['id']}")
     ]);
-    Items::render_view($root);
+    $this->render_view($root);
   }
 
   function get_user()
@@ -71,12 +59,13 @@ class UserController extends Controller
       ->Where(['username=' => $username])
       ->Do();
     if (!$users) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     $user = $users[0];
-    if ($user['id'] != Items::$user['id']) {
-      Items::render("./public/ecommerce/html/not_found.html");
+    // var_dump();
+    if ($user['id'] != $this->user['id']) {
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     $orders = (new Model('orders'))
@@ -92,6 +81,6 @@ class UserController extends Controller
     $root->append(new HtmlElement('h1', ['class' => 'text-4xl m-5'], "Hi, {$user['username']}, these are your orders!"));
     $root->append(new HtmlElement('h1', ['class' => 'text-2xl m-5'], "Click on the ID column to go for more details about that order."));
     $root->append($table->render("/user"));
-    Items::render_view($root);
+    $this->render_view($root);
   }
 }

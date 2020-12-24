@@ -1,7 +1,8 @@
 <?php
 
+require_once './public/ecommerce/controllers/auth.php';
 
-class Shop extends Controller
+class Shop extends Auth
 {
   static $instance;
 
@@ -28,7 +29,7 @@ class Shop extends Controller
   {
     // QueryOptions::$DEBUG_QUERIES = true;
     $cart = new Model('cart_item');
-    $id = Items::$user['id'];
+    $id = $this->user['id'];
     $rows = $cart
       ->Select('items.id_ext as item_id, cart_item.quantity as quantity, items.price as price')
       ->Join('items', ['items.id_ext=' => new Name('cart_item.item_id')])
@@ -37,7 +38,7 @@ class Shop extends Controller
     $cart = new Model('cart_item');
     $ok = $cart->Delete()->Where(['cart_item.user_id='  => $id])->Do();
     if ($ok === false) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     $orderId = UUID::v4();
@@ -47,7 +48,7 @@ class Shop extends Controller
       'date' => time(),
       'status' => 'PROC',
     ])->Do()) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     foreach ($rows as $item) {
@@ -59,7 +60,7 @@ class Shop extends Controller
         'original_price' => $item['price'],
       ])->Do();
       if (!$ok) {
-        Items::render("./public/ecommerce/html/not_found.html");
+        $this->render("./public/ecommerce/html/not_found.html");
         return;
       }
     }
@@ -69,7 +70,7 @@ class Shop extends Controller
   function get_cart_items()
   {
 
-    $id = Items::$user['id'];
+    $id = $this->user['id'];
     $cart = new Model('cart_item');
     $cart = $cart
       ->Select(Shop::$SELECT_ATTRIBUTES_ALL)
@@ -85,7 +86,9 @@ class Shop extends Controller
     // echo "<pre>", var_dump($items), "</pre>";
     require_once './public/ecommerce/views/cart_list.php';
     $cartList = new CartList($items);
-    Items::render_view($cartList->render());
+    // echo 'eee';
+    // var_dump($cartList);
+    $this->render_view($cartList->render());
   }
 
   function remove_item()
@@ -95,17 +98,17 @@ class Shop extends Controller
     $cartItem = $cart
       ->Select('quantity')
       ->Where(['item_id=' => $itemID])
-      ->And(['user_id=' => Items::$user['id']])
+      ->And(['user_id=' => $this->user['id']])
       ->Do();
     if (!$cartItem) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     $cartItem = $cartItem[0];
     // Select the item (we want the type and the quantity)
     $item = (new Model('items'))->Select('type, quantity')->Where(['id_ext=' => $itemID])->Do();
     if (!$item) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     $item = $item[0];
@@ -115,13 +118,13 @@ class Shop extends Controller
       ->Where(['id_ext=' => $itemID])
       ->Set(['quantity' => $item['quantity'] + $cartItem['quantity']])
       ->Do()) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
     }
     // Delete from cart
     $ok = $cart
       ->Delete()
       ->Where(['item_id=' => $itemID])
-      ->And(['user_id=' => Items::$user['id']])
+      ->And(['user_id=' => $this->user['id']])
       ->Do();
     if (!$ok) {
       App::set_response_header('location', "/shop/{$item['type']}/{$itemID}?error=3");
@@ -142,7 +145,7 @@ class Shop extends Controller
     QueryOptions::$DEBUG_QUERIES = false;
     $type = App::$uri_params['type'];
     if (!isset(Items::$available_types[$type])) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     $id = App::$uri_params['id'];
@@ -166,18 +169,18 @@ class Shop extends Controller
     $existingItem = $cart
       ->Select('quantity')
       ->Where(['item_id=' => $id])
-      ->And(['user_id=' => Items::$user['id']])
+      ->And(['user_id=' => $this->user['id']])
       ->Do();
     if ($existingItem) {
       $rows[0]['Current items in cart'] = $existingItem[0]['quantity'];
     }
     if (!$rows) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     require_once './public/ecommerce/views/item.php';
     $itemView = new ItemView($rows[0], $images);
-    Items::render_view($itemView->render(!!$existingItem));
+    $this->render_view($itemView->render(!!$existingItem));
   }
 
   function post_item()
@@ -185,7 +188,7 @@ class Shop extends Controller
     $itemID = App::$uri_params['item_id'];
     $item = (new Model('items'))->Select('*')->Where(['id_ext=' => $itemID])->Limit(1)->Do();
     if (!$item) {
-      Items::render("./public/ecommerce/html/not_found.html");
+      $this->render("./public/ecommerce/html/not_found.html");
       return;
     }
     $item = $item[0];
@@ -214,21 +217,21 @@ class Shop extends Controller
     $existingItem = $cart
       ->Select('quantity')
       ->Where(['item_id=' => $item['id_ext']])
-      ->And(['user_id=' => Items::$user['id']])
+      ->And(['user_id=' => $this->user['id']])
       ->Do();
     $cart = new Model('cart_item');
     $itemUpd = [
       'quantity' => $body['quantity'],
       'item_id' => $itemID,
       'added' => time(),
-      'user_id' => Items::$user['id'],
+      'user_id' => $this->user['id'],
     ];
     if ($existingItem) {
       $itemUpd['quantity'] += $existingItem[0]['quantity'];
       $cart
         ->Update()
         ->Where(['item_id=' => $itemID])
-        ->And(['user_id=' => Items::$user['id']])
+        ->And(['user_id=' => $this->user['id']])
         ->Set($itemUpd)
         ->Do();
     } else {
@@ -248,7 +251,7 @@ class Shop extends Controller
       return;
     }
     $id = $_SESSION['id'];
-    Items::$user = User::getById($id);
+    $this->user = User::getById($id);
   }
 
   function cleanItems()
