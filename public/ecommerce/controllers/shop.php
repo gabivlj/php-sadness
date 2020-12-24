@@ -128,7 +128,7 @@ class Shop extends Controller
     } else {
       // If we can redirect to previous page, do it.
       if (isset($_SERVER["HTTP_REFERER"])) {
-        App::set_response_header("Location: ", $_SERVER["HTTP_REFERER"]);
+        App::set_response_header("location", $_SERVER["HTTP_REFERER"]);
       } else {
         App::set_response_header('location', "/shop/{$item['type']}/{$itemID}");
       }

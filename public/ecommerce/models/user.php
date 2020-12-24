@@ -59,7 +59,7 @@ class User
   static function updatePassword($token, $password, $email)
   {
     $repo = new Model("users");
-    $salt = random_bytes(24);
+    $salt = UUID::v4();
     $passwordHash = password_hash($password, PASSWORD_BCRYPT, ['salt' => $salt]);
     $res = $repo
       ->Update()
@@ -129,7 +129,7 @@ class User
     $repository = new Model("users");
     $id = UUID::v4();
     $confirmationToken = UUID::v4();
-    $salt = random_bytes(24);
+    $salt = UUID::v4();
     $passwordHash = password_hash($password, PASSWORD_BCRYPT, ['salt' => $salt]);
     if ($repository->Create([
       'username' => $username,
