@@ -2,29 +2,19 @@
   <main class="my-8">
    
     <div class="container mx-auto px-6">
-        <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="text" placeholder="Headset name" name="name">
-        <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="number" placeholder="Minimum Price" name="price_min">
-        <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="number" placeholder="Maximum Price" name="price_max">
-      <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="number" placeholder="Weight" name="weight">
-      <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="number" placeholder="Cable Length" name="cable_length">
-      Bluetooth:
-      <select type="select" name="bluetooth" class="input">
-        <option value="1" >Yes</option>
-        <option value="0">No</option>
-        <option value="null" selected>Don't care</option>
-    </select>
-      <br>
-      <div class="mt-5"></div>
+      <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="text" placeholder="Name" name="name">
+      <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="number" placeholder="Minimum Price" name="price_min">
+      <input class="w-36 border rounded-md pl-10 pr-4 py-2 focus:border-blue-500 focus:outline-none focus:shadow-outline input" type="number" placeholder="Maximum Price" name="price_max">
       <select type="select" name="order_by" class="input">
           <option value="default" selected>Default</option>
           <option value="price_asc">Price Ascendent</option>
           <option value="price_desc">Price Descendent</option>
       </select>
-      <button class="p-2 rounded-full bg-blue-600 text-white mx-5  hover:bg-blue-500 focus:outline-none focus:bg-blue-500 mb-3" id="submit">
+      <button class="p-2 rounded-full bg-blue-600 text-white mx-5  hover:bg-blue-500 focus:outline-none focus:bg-blue-500" id="submit">
           <svg class="h-5 w-5" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"></path></svg>
       </button>
      
-        <h3 class="text-gray-700 text-2xl font-medium">Headsets</h3>
+        <h3 class="text-gray-700 text-2xl font-medium">All of the products</h3>
         <span class="mt-3 text-sm text-gray-500">Products</span>
         <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6" id="products">
           

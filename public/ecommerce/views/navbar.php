@@ -43,7 +43,7 @@ function nav($links)
 function navBarUnverified()
 {
   return nav([
-    ['link' => '/home', 'text' => 'Home'],
+    ['link' => '/search', 'text' => 'Home'],
     ['link' => '/sign_up/login', 'text' => 'Login'],
     ['link' => '/sign_up/register', 'text' => 'Register'],
   ]);
@@ -54,7 +54,7 @@ function navBarUnverified()
 function navBarVerified($username, $admin)
 {
   $links = [
-    ['link' => '/search', 'text' => 'All Products'],
+    ['link' => '/search', 'text' => 'Home'],
     ['link' => '/search/albums', 'text' => 'CDs/Vynils'],
     ['link' => '/search/headset', 'text' => 'Headsets'],
     ['link' => '/search/players', 'text' => 'Players'],

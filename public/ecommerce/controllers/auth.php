@@ -22,6 +22,16 @@ class Auth extends Controller
     }
   }
 
+  public function try_fill_user()
+  {
+    session_start();
+    if (!isset($_SESSION['id'])) {
+      return;
+    }
+    $id = $_SESSION['id'];
+    $this->user = User::getById($id);
+  }
+
   public function fill_user()
   {
     session_start();
@@ -43,10 +53,18 @@ class Auth extends Controller
       HtmlElement::Style($tailwindCSS)
     );
     require_once './public/ecommerce/views/navbar.php';
+    $navbar = null;
+    if ($this->user === null) {
+      $navbar = navBarUnverified();
+    } else {
+      $navbar = navBarVerified(
+        $this->user['username'],
+        isset($this->user['admin']) && $this->user['admin']
+      );
+    }
     HtmlRoot::append(
       HtmlElement::Body()
-        ->append(navBarVerified($this->user['username'], isset($this->user['admin'])
-          && $this->user['admin']))
+        ->append($navbar)
         ->append($view)
     );
     HtmlRoot::end();
@@ -60,10 +78,16 @@ class Auth extends Controller
       HtmlElement::Style($tailwindCSS)
     );
     require_once './public/ecommerce/views/navbar.php';
+    $navbar = null;
+    if ($this->user === null) {
+      $navbar = navBarUnverified();
+    } else {
+      $navbar = navBarVerified($this->user['username'], isset($this->user['admin'])
+        && $this->user['admin']);
+    }
     HtmlRoot::append(
       HtmlElement::Body()
-        ->append(navBarVerified($this->user['username'], isset($this->user['admin'])
-          && $this->user['admin']))
+        ->append($navbar)
         ->append(HtmlElement::raw(file_get_contents($html_path)))
     );
     HtmlRoot::end();
