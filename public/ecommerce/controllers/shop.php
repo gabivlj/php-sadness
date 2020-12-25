@@ -35,6 +35,10 @@ class Shop extends Auth
       ->Join('items', ['items.id_ext=' => new Name('cart_item.item_id')])
       ->Where(['cart_item.user_id=' => $id])
       ->Do();;
+    if (!$rows) {
+      App::set_response_header('location', '/shop/cart');
+      return;
+    }
     $cart = new Model('cart_item');
     $ok = $cart->Delete()->Where(['cart_item.user_id='  => $id])->Do();
     if ($ok === false) {
@@ -64,7 +68,7 @@ class Shop extends Auth
         return;
       }
     }
-    App::set_response_header('location', '/shop/cart');
+    App::set_response_header('location', "/user/orders/{$orderId}?success");
   }
 
   function get_cart_items()

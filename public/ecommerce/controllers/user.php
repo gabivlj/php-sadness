@@ -9,7 +9,7 @@ class UserController extends Auth
     $ins = new UserController("/user");
     UserController::$instance = $ins;
     $ins->get("/:username", ['fill_user', 'get_user']);
-    $ins->get("/order/:order_id", ['fill_user', 'get_user_order']);
+    $ins->get("/orders/:order_id", ['fill_user', 'get_user_order']);
   }
 
   function get_user_order()
@@ -18,6 +18,7 @@ class UserController extends Auth
     require_once './public/ecommerce/views/delete_button.php';
     $orderID = App::$uri_params['order_id'];
     $order = new Model('orders');
+    $isSuccess = isset(App::query_params()['success']);
     $rows = $order
       ->Select('orders.id, orders.status, orders.user_id')
       ->Where(['id=' => $orderID])
@@ -41,9 +42,14 @@ class UserController extends Auth
       ->Do();
     $table = new Table($rows, 'orders');
     $tableItems = new Table($itemRows, null);
+    $successMsg = new HtmlElement('div', [], []);
+    if ($isSuccess) {
+      $successMsg = new HtmlElement('h1', ['class' => 'text-4xl p-10 bg-green-200'], 'Your order has been successfuly ordered!');
+    }
     $root = new HtmlElement('div', ['class' => 'container'], [
-      $table->render(),
-      $tableItems->render(),
+      $table->render('/user'),
+      $tableItems->render('/shop'),
+      $successMsg
       // (new DeleteButton())->render("/orders/admin/delete/{$order['id']}")
     ]);
     $this->render_view($root);
@@ -76,7 +82,7 @@ class UserController extends Auth
       $orders = [];
     }
     require_once './public/ecommerce/views/table.php';
-    $table = new Table($orders, 'order');
+    $table = new Table($orders, 'orders');
     $root = new HtmlElement('div', ['class' => 'container'], []);
     $root->append(new HtmlElement('h1', ['class' => 'text-4xl m-5'], "Hi, {$user['username']}, these are your orders!"));
     $root->append(new HtmlElement('h1', ['class' => 'text-2xl m-5'], "Click on the ID column to go for more details about that order."));
