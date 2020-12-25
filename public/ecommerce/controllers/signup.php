@@ -36,7 +36,7 @@ class Signup extends Controller
   {
     session_start();
     if (isset($_SESSION['id'])) {
-      App::set_response_header('location', '/home');
+      App::set_response_header('location', '/search');
       $this->stop();
     }
   }
@@ -92,7 +92,7 @@ class Signup extends Controller
     $_SESSION['email'] = $user['email'];
     $_SESSION['id'] = $user['id'];
     $_SESSION['username'] = $user['username'];
-    App::json(['user' => $user, 'message' => 'Success!', 'redirect' => '/home']);
+    App::json(['user' => $user, 'message' => 'Success!', 'redirect' => '/search']);
   }
 
   /**
