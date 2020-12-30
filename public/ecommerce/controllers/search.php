@@ -82,13 +82,12 @@ class Search extends Auth
     $queryParams = App::query_params();
     $model = new Model('items');
     $params = Search::$selection_params;
-    // QueryOptions::$DEBUG_QUERIES = true;
     $query = $model->Select("$params, headset.name as name_headset, albums.name as name_albums, players.name as name_players");
     $query->LOJoin('albums', ['albums.id=' => new Name('items.id_ext')]);
     $query->LOJoin('headset', ['headset.id=' => new Name('items.id_ext')]);
     $query->LOJoin('players', ['players.id=' => new Name('items.id_ext')]);
-    // Dummy Where
-    $where = new Where(['items.id_ext=' => new Name('items.id_ext')]);
+    // Dummy Where so we can do readable buildup on it
+    $where = new Where();
     if (isset($queryParams['name'])) {
       $name = "%{$queryParams['name']}%";
       $where->And(['albums.name LIKE ' => $name])
@@ -111,6 +110,7 @@ class Search extends Auth
 
   function find_products_by_type()
   {
+    // QueryOptions::$DEBUG_QUERIES = true;
     $uriParams = App::$uri_params;
     $type = $uriParams['type'];
     if (!isset(Items::$available_types[$type])) {

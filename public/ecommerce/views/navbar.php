@@ -66,6 +66,7 @@ function navBarVerified($username, $admin)
   if ($admin) {
     $links[] = ['link' => '/orders/admin', 'text' => 'OrdersDash'];
     $links[] = ['link' => '/items/admin/albums', 'text' => 'Albums Dash'];
+    $links[] = ['link' => '/items/admin/artists', 'text' => 'Artists Dash'];
     $links[] = ['link' => '/items/admin/headset', 'text' => 'Headset Dash'];
     $links[] = ['link' => '/items/admin/players', 'text' => 'Players Dash'];
     $links[] = ['link' => '/items/admin/users', 'text' => 'Users Dashboard'];

@@ -40,7 +40,7 @@ class Items extends Auth
 
   function delete_item()
   {
-    // QueryOptions::$DEBUG_QUERIES = true;
+
     $uriParams = App::$uri_params;
     $id = $uriParams['id'];
     $type = $uriParams['type'];
@@ -276,6 +276,7 @@ class Items extends Auth
 
   function get_items()
   {
+    // QueryOptions::$DEBUG_QUERIES = true;
     $params = App::$uri_params;
     $type = $params['type'];
     if (!isset(Items::$available_types[$type])) {

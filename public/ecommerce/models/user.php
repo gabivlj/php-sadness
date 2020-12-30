@@ -30,6 +30,9 @@ class User
       return false;
     }
     $user = $rows[0];
+    if (!$user['verified']) {
+      return false;
+    }
     $passwordHash = password_hash($password, PASSWORD_BCRYPT, ['salt' => $user['salt']]);
     if ($passwordHash !== $user['password']) {
       return false;

@@ -11,10 +11,6 @@ class Order extends Auth
     $ins->get("/admin", ['fill_admin', 'get_orders']);
     $ins->get("/admin/:user_id", ['fill_admin', 'get_orders']);
     $ins->get("/admin/orders/:id", ['fill_admin', 'get_order']);
-    // todo:
-    $ins->post("/admin/update/:id", ['fill_admin', 'update_order']);
-    // todo:
-    $ins->post("/admin/delete/:id", ['fill_admin', 'delete_order']);
   }
 
   function get_orders()

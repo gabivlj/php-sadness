@@ -101,8 +101,9 @@ class Where
     }
   }
 
-  function __construct($start)
+  function __construct($start = [])
   {
+    if (!$start) $start = ['true=' => new Name('true')];
     $this->query = [];
     $this->cond = $this->keyValue($start);
   }

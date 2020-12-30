@@ -146,7 +146,7 @@ class Shop extends Auth
   {
     // Clean items
     $this->cleanItems();
-    QueryOptions::$DEBUG_QUERIES = false;
+    //QueryOptions::$DEBUG_QUERIES = false;
     $type = App::$uri_params['type'];
     if (!isset(Items::$available_types[$type])) {
       $this->render("./public/ecommerce/html/not_found.html");
@@ -261,13 +261,20 @@ class Shop extends Auth
   function cleanItems()
   {
     // 30 MINS
-    $SECONDS_EXPIRES = 60 * 30;
+    $SECONDS_EXPIRES = 2;
     $item = new Model('cart_item');
+    // Get item quantities
     $rows = $item
       ->Select('added, quantity, item_id')
       ->Where(['added<' => time() - $SECONDS_EXPIRES])
       ->Do();
+    // Delete Items
+    $item
+      ->Delete('added, quantity, item_id')
+      ->Where(['added<' => time() - $SECONDS_EXPIRES])
+      ->Do();
     if (!$rows) return;
+    // Etc
     foreach ($rows as $row) {
       (new Model('items'))
         ->Update()
@@ -275,9 +282,5 @@ class Shop extends Auth
         ->Where(['id_ext=' => $row['item_id']])
         ->Do();
     }
-    $item
-      ->Delete('added, quantity, item_id')
-      ->Where(['added<' => time() - $SECONDS_EXPIRES])
-      ->Do();
   }
 }
