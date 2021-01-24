@@ -242,7 +242,7 @@ class Shop extends Auth
       ->Do();
     if ($rows && $this->user['json']) {
       if ($existingItem)
-        $rows[0]['quantity'] = $existingItem[0]['quantity'];
+        $rows[0]['Current items in cart'] = $existingItem[0]['quantity'];
       $rows[0]['image'] = $images[0];
       App::json($rows[0]);
       return;
@@ -337,7 +337,7 @@ class Shop extends Auth
   function cleanItems()
   {
     // 30 MINS
-    $SECONDS_EXPIRES = 2;
+    $SECONDS_EXPIRES = 60 * 60 * 60;
     $item = new Model('cart_item');
     // Get item quantities
     $rows = $item
