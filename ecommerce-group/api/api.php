@@ -5,6 +5,18 @@ require_once dirname(__DIR__) . '/api/request.php';
 define("GVS_IMAGE_TYPE", 1);
 define("DANI_IMAGE_TYPE", 2);
 
+
+function getProductMap()
+{
+  $URIS_PRODUCT = [
+    'gvs' => function ($type, $id) {
+      return "http://apigvillalonga20.000webhostapp.com/shop/$type/$id";
+    }
+  ];
+  return $URIS_PRODUCT;
+}
+
+
 class API
 {
   static $REGISTER_URI_GVILL = 'http://apigvillalonga20.000webhostapp.com/sign_up/special_register';
@@ -52,6 +64,20 @@ class API
       return [];
     }
     $response = &$responseGVS;
+    return $response;
+  }
+
+  static function getProduct($type, $web, $id, $password, $username)
+  {
+    $uri = getProductMap()[$web]($type, $id);
+    $req = new Request($uri);
+    $req->setRequestType('GET');
+    $req->execute(array("X-USER: $username", "X-PASSWORD: $password"));
+    $response = json_decode($req->getResponse(), true);
+    if ($web == "gvs") {
+      $response['image_uri'] = API::getImage(GVS_IMAGE_TYPE, $response['image']['id']);
+      $response['web'] = 'gvs';
+    }
     return $response;
   }
 }

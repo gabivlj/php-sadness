@@ -14,10 +14,16 @@
  *   $request->execute();
  * @endcode
  *
+ * 
+ * This library was modified by the team of the Ecommerce Group
+ * so we can add custom headers to curl
+ * 
  * Minimum requirements: PHP 5.3.x, cURL.
  *
- * @version 1.0-beta1
+ * @version 1.0-beta1 (MODIFIED VERSION FOR THE ECOMMERCE-GROUP PROJECT)
  * @author Jeff Geerling (geerlingguy).
+ * 
+ * @modifiedby Gabriel Villalonga ([gabivlj](https://github.com/gabivlj))
  */
 
 
@@ -280,8 +286,10 @@ class Request
    *
    * After this method is completed, the response body, headers, latency, etc.
    * will be populated, and can be accessed with the appropriate methods.
+   * 
+   * @param array $additionalHeaders An array of HTTP header fields to set, in the format array('Content-type: text/plain', 'Content-length: 100')
    */
-  public function execute()
+  public function execute($additionalHeaders = [])
   {
     // Set a default latency value.
     $latency = 0;
@@ -319,6 +327,11 @@ class Request
     curl_setopt($ch, CURLOPT_USERAGENT, $this->userAgent);
     // Output the header in the response.
     curl_setopt($ch, CURLOPT_HEADER, TRUE);
+
+    // (gabivlj) : Customized the library so we can put additional headers :) 
+    if ($additionalHeaders) {
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $additionalHeaders);
+    }
     $response = curl_exec($ch);
     $error = curl_error($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

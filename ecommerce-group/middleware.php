@@ -19,3 +19,8 @@ function redirectIfNotLogedIn()
   }
   return false;
 }
+
+function getSession()
+{
+  return $_SESSION;
+}
