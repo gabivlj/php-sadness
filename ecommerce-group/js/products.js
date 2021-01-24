@@ -1,14 +1,41 @@
 let currentSearch = '';
 let currentProducts = [];
 
+const searchMethods = {
+  priceAsc: (a, b) => {
+    return a.price - b.price;
+  },
+  priceDesc: (a, b) => {
+    return b.price - a.price;
+  },
+  nameAsc: (a, b) => {
+    return a.name.localeCompare(b.name);
+  },
+  nameDesc: (a, b) => {
+    return b.name.localeCompare(a.name);
+  },
+};
+
 const searchForm = document.getElementById('search');
 const input = document.getElementById('search_term');
 const loading = document.getElementById('loading');
+const select = document.getElementById('select');
+
+select.addEventListener('change', e => {
+  sortBy(e.target.value);
+  updateItems();
+});
+
 searchForm.addEventListener('submit', e => {
   e.preventDefault();
   currentSearch = input.value;
   getItems();
 });
+
+function sortBy(search) {
+  currentProducts.sort(searchMethods[search] || (() => 0));
+}
+
 function getItems() {
   loading.innerHTML = 'Loading...';
   fetch(
@@ -23,9 +50,11 @@ function getItems() {
     })
     .catch(err => console.log(err));
 }
+
 getItems();
 
 const list = document.getElementById('list');
+
 function updateItems() {
   list.innerHTML = currentProducts
     .map(({ name, type, price, image_uri, id, web }) =>

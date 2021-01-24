@@ -1,3 +1,15 @@
+<?php
+require_once './db.php';
+require_once './api/api.php';
+require_once './middleware.php';
+require_once '../express-php/express.php';
+require_once '../express-php/uuid.php';
+require_once '../public/ecommerce/email.php';
+if (redirectIfNotLogedIn()) {
+  die();
+}
+?>
+
 <head>
   <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
@@ -12,6 +24,12 @@
         <input type="text" id="search_term" class="form-control" id="productName" aria-describedby="productHelp" placeholder="Product Name">
       </form>
     </div>
+    <select name="select" id="select">
+      <option value="priceAsc" selected>Price Ascendent</option>
+      <option value="priceDesc">Price Descendent</option>
+      <option value="nameAsc">Name Ascendent</option>
+      <option value="nameDesc">Name Descendent</option>
+    </select>
     <h4 id="loading">Loading...</h4>
     <div class="row text-center text-white mb-5">
       <div class="col-lg-7 mx-auto">

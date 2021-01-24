@@ -9,3 +9,13 @@ function redirectIfLogedIn()
   }
   return false;
 }
+
+function redirectIfNotLogedIn()
+{
+  session_start();
+  if (!isset($_SESSION['email'])) {
+    header("Location: /ecommerce-group/login_html.php");
+    return true;
+  }
+  return false;
+}
