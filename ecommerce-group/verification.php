@@ -11,7 +11,6 @@ if (!isset($_GET['e'])) {
   error("Don't go to verify bro");
   return;
 }
-QueryOptions::$DEBUG_QUERIES = true;
 $email = $_GET['e'];
 $token = $_GET['t'];
 $users = (new Model('users'))->Select('password')->Where(['email=' => $email, 'confirmed=' => 0, 'token=' => $token])->Do();
