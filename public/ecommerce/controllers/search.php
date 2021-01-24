@@ -100,10 +100,15 @@ class Search extends Auth
     if (!$rows) {
       App::json(['items' => []]);
     } else {
+      // Shop::normalizeItems($rows);
       $rows = array_map(function ($el) {
         $el['name'] = $el["name_{$el['type']}"];
+        // unset($el["name_headset"]);
+        // unset($el["name_players"]);
+        // unset($el["name_albums"]);
         return $el;
       }, $rows);
+
       App::json(['items' => $rows]);
     }
   }

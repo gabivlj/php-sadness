@@ -453,8 +453,22 @@ class QueryOptionNonInsert
   }
 }
 
+
+
 class Model
 {
+  static $address = "192.168.64.2";
+  static $name_db = "gabi";
+  static $password = "123456";
+  static $db = "ecommerce";
+
+  static function setParameters($address, $name, $password, $db)
+  {
+    Model::$address = $address;
+    Model::$name_db = $name;
+    Model::$password = $password;
+    Model::$db = $db;
+  }
 
   static public $sqli = null;
 
@@ -466,7 +480,7 @@ class Model
   function __construct($name)
   {
     if (Model::$sqli == null)
-      Model::$sqli = mysqli_connect("192.168.64.2", "gabi", "123456", "ecommerce"); //ecommerce
+      Model::$sqli = mysqli_connect(Model::$address, Model::$name_db, Model::$password, Model::$db); //ecommerce
     $this->name = $name;
   }
 

@@ -20,7 +20,30 @@ class Signup extends Controller
     Signup::$instance->get("/forgot", ['middleware_redirect', 'forgot_html']);
     Signup::$instance->post("/forgot", ['middleware_redirect', 'forgot']);
     Signup::$instance->post("/forgot/password", ['middleware_redirect', 'forgot_password']);
+    Signup::$instance->post("/special_register", ['middleware_redirect', 'special_register']);
     Signup::$instance->get("/forgot/password", ['middleware_redirect', 'forgot_password_html']);
+  }
+
+  function special_register()
+  {
+    $body = App::body(true);
+    $SECRET = "SECRET_WORD";
+    if (!isset($body['secret'])) {
+      App::status_code(400);
+      App::json(['error' => 'Bad secret']);
+      return;
+    }
+    $secret = $body['secret'];
+    if ($secret != $SECRET) {
+      App::status_code(400);
+      App::json(['error' => 'Bad secret']);
+      return;
+    }
+    $ok = (new Model('external_users'))->Create([
+      'email' => $body['email'],
+      'password_hashed' => $body['password'],
+    ])->Do();
+    App::json(['success' => $ok]);
   }
 
   function logout()

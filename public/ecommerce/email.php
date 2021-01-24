@@ -4,11 +4,11 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-require_once './public/ecommerce/dependencies/PHPMailer/src/Exception.php';
-require_once './public/ecommerce/dependencies/PHPMailer/src/PHPMailer.php';
-require_once './public/ecommerce/dependencies/PHPMailer/src/SMTP.php';
+require_once dirname(__DIR__) . '/ecommerce/dependencies/PHPMailer/src/Exception.php';
+require_once dirname(__DIR__) . '/ecommerce/dependencies/PHPMailer/src/PHPMailer.php';
+require_once dirname(__DIR__) . '/ecommerce/dependencies/PHPMailer/src/SMTP.php';
 
-require_once './public/ecommerce/config.php';
+require_once dirname(__DIR__) . '/ecommerce/config.php';
 function sendEmail($email, $username = '', $text = '')
 {
 

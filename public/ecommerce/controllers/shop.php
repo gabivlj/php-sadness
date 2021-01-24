@@ -4,6 +4,27 @@ require_once './public/ecommerce/controllers/auth.php';
 
 class Shop extends Auth
 {
+  static function normalizeItems(&$items)
+  {
+    for ($i = 0; $i < count($items); $i++) {
+      $item = &$items[$i];
+      if ($item['headset_name']) {
+        $item['name'] = $item['headset_name'];
+        $item['type'] = 'headset';
+      }
+      if ($item['players_name']) {
+        $item['name'] = $item['players_name'];
+        $item['type'] = 'players';
+      }
+      if ($item['albums_name']) {
+        $item['name'] = $item['albums_name'];
+        $item['type'] = 'albums';
+      }
+      unset($item['headset_name']);
+      unset($item['players_name']);
+      unset($item['albums_name']);
+    }
+  }
   static $instance;
 
   static $SELECT_ATTRIBUTES_ALL = 'DISTINCT cart_item.item_id, cart_item.id as cart_item_id, headset.name as headset_name, players.name as players_name, albums.name as albums_name, image.id as image_id, cart_item.quantity as quantity, items.type as type, items.price as price';
@@ -36,13 +57,21 @@ class Shop extends Auth
       ->Where(['cart_item.user_id=' => $id])
       ->Do();;
     if (!$rows) {
-      App::set_response_header('location', '/shop/cart');
+      if (!$this->user['json'])
+        $this->render("./public/ecommerce/html/not_found.html");
+      else {
+        App::json(['success' => false]);
+      }
       return;
     }
     $cart = new Model('cart_item');
     $ok = $cart->Delete()->Where(['cart_item.user_id='  => $id])->Do();
     if ($ok === false) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      if (!$this->user['json'])
+        $this->render("./public/ecommerce/html/not_found.html");
+      else {
+        App::json(['success' => false]);
+      }
       return;
     }
     $orderId = UUID::v4();
@@ -52,7 +81,11 @@ class Shop extends Auth
       'date' => time(),
       'status' => 'PROC',
     ])->Do()) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      if (!$this->user['json'])
+        $this->render("./public/ecommerce/html/not_found.html");
+      else {
+        App::json(['success' => false]);
+      }
       return;
     }
     foreach ($rows as $item) {
@@ -64,16 +97,23 @@ class Shop extends Auth
         'original_price' => $item['price'],
       ])->Do();
       if (!$ok) {
-        $this->render("./public/ecommerce/html/not_found.html");
+        if (!$this->user['json'])
+          $this->render("./public/ecommerce/html/not_found.html");
+        else {
+          App::json(['success' => false]);
+        }
         return;
       }
     }
-    App::set_response_header('location', "/user/orders/{$orderId}?success");
+    if (!$this->user['json'])
+      App::set_response_header('location', "/user/orders/{$orderId}?success");
+    else {
+      App::json(['success' => true, 'order_id' => $orderId]);
+    }
   }
 
   function get_cart_items()
   {
-
     $id = $this->user['id'];
     $cart = new Model('cart_item');
     $cart = $cart
@@ -87,6 +127,11 @@ class Shop extends Auth
       ->Join('image', ['image.item_id=' => new Name('cart_item.item_id')])
       ->GroupBy("cart_item.item_id");
     $items = $cart->Do();
+    if ($this->user['json']) {
+      Shop::normalizeItems($items);
+      App::json(['items' => $items]);
+      return;
+    }
     // echo "<pre>", var_dump($items), "</pre>";
     require_once './public/ecommerce/views/cart_list.php';
     $cartList = new CartList($items);
@@ -105,14 +150,22 @@ class Shop extends Auth
       ->And(['user_id=' => $this->user['id']])
       ->Do();
     if (!$cartItem) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      if (!$this->user['json'])
+        $this->render("./public/ecommerce/html/not_found.html");
+      else {
+        App::json(['success' => false]);
+      }
       return;
     }
     $cartItem = $cartItem[0];
     // Select the item (we want the type and the quantity)
     $item = (new Model('items'))->Select('type, quantity')->Where(['id_ext=' => $itemID])->Do();
     if (!$item) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      if (!$this->user['json'])
+        $this->render("./public/ecommerce/html/not_found.html");
+      else {
+        App::json(['success' => false]);
+      }
       return;
     }
     $item = $item[0];
@@ -122,7 +175,11 @@ class Shop extends Auth
       ->Where(['id_ext=' => $itemID])
       ->Set(['quantity' => $item['quantity'] + $cartItem['quantity']])
       ->Do()) {
-      $this->render("./public/ecommerce/html/not_found.html");
+      if (!$this->user['json'])
+        $this->render("./public/ecommerce/html/not_found.html");
+      else {
+        App::json(['success' => false]);
+      }
     }
     // Delete from cart
     $ok = $cart
@@ -131,8 +188,16 @@ class Shop extends Auth
       ->And(['user_id=' => $this->user['id']])
       ->Do();
     if (!$ok) {
-      App::set_response_header('location', "/shop/{$item['type']}/{$itemID}?error=3");
+      if (!$this->user['json'])
+        App::set_response_header('location', "/shop/{$item['type']}/{$itemID}?error=3");
+      else {
+        App::json(['success' => false]);
+      }
     } else {
+      if ($this->user['json']) {
+        App::json(['success' => true]);
+        return;
+      }
       // If we can redirect to previous page, do it.
       if (isset($_SERVER["HTTP_REFERER"])) {
         App::set_response_header("location", $_SERVER["HTTP_REFERER"]);
@@ -175,6 +240,16 @@ class Shop extends Auth
       ->Where(['item_id=' => $id])
       ->And(['user_id=' => $this->user['id']])
       ->Do();
+    if ($rows && $this->user['json']) {
+      if ($existingItem)
+        $rows[0]['quantity'] = $existingItem[0]['quantity'];
+      $rows[0]['image'] = $images[0];
+      App::json($rows[0]);
+      return;
+    } else if ($this->user['json']) {
+      App::json(['error' => 'not found']);
+      return;
+    }
     if ($existingItem) {
       $rows[0]['Current items in cart'] = $existingItem[0]['quantity'];
     }
@@ -189,6 +264,7 @@ class Shop extends Auth
 
   function post_item()
   {
+    $json = $this->user['json'];
     $itemID = App::$uri_params['item_id'];
     $item = (new Model('items'))->Select('*')->Where(['id_ext=' => $itemID])->Limit(1)->Do();
     if (!$item) {
@@ -199,6 +275,10 @@ class Shop extends Auth
     $body = App::body(false, true);
     // Check quantities
     if ($item['quantity'] < $body['quantity']) {
+      if ($json) {
+        App::json(['error' => 'not enough items']);
+        return;
+      }
       App::set_response_header(
         'location',
         "/shop/{$item['type']}/{$itemID}?error=1"
@@ -213,6 +293,10 @@ class Shop extends Auth
       ->Where(['id_ext=' => $itemID])
       ->Set(['quantity' => $newQuantity])
       ->Do()) {
+      if ($json) {
+        App::json(['error' => 'unknown']);
+        return;
+      }
       App::set_response_header('location', "/shop/{$item['type']}/{$itemID}?error=2");
       return;
     }
@@ -243,19 +327,11 @@ class Shop extends Auth
         ->Create($itemUpd)
         ->Do();
     }
-    App::set_response_header('location', "/shop/{$item['type']}/{$itemID}");
-  }
-
-  function fill_user()
-  {
-    session_start();
-    if (!isset($_SESSION['id'])) {
-      App::set_response_header('location', '/sign_up/login');
-      $this->stop();
+    if ($json) {
+      App::json(['success' => true]);
       return;
     }
-    $id = $_SESSION['id'];
-    $this->user = User::getById($id);
+    App::set_response_header('location', "/shop/{$item['type']}/{$itemID}");
   }
 
   function cleanItems()
