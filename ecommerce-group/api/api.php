@@ -40,6 +40,9 @@ class API
     $req->setRequestType('GET');
     $req->execute();
     $responseGVS = json_decode($req->getResponse(), true);
+    if (!isset($responseGVS)) {
+      return ["items" => []];
+    }
     foreach ($responseGVS['items'] as &$item) {
       $item['web'] = 'gvs';
       $item['image_uri'] = API::getImage(GVS_IMAGE_TYPE, $item['image_id']);
