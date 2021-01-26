@@ -1,6 +1,6 @@
 <?php
 
-require '../express-php/db/db.php';
+require_once '../express-php/db/db.php';
 
 function initDB()
 {

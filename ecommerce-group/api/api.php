@@ -1,6 +1,7 @@
 
 <?php
 require_once dirname(__DIR__) . '/api/request.php';
+require_once dirname(__DIR__) . '/middleware.php';
 
 define("GVS_IMAGE_TYPE", 1);
 define("DANI_IMAGE_TYPE", 2);
@@ -14,6 +15,16 @@ function getProductMap()
     }
   ];
   return $URIS_PRODUCT;
+}
+
+function getShopAddCartMap()
+{
+  $URIS_ADD_CART = [
+    'gvs' => function ($id, $_type) {
+      return "http://apigvillalonga20.000webhostapp.com/shop/cart/$id";
+    }
+  ];
+  return $URIS_ADD_CART;
 }
 
 
@@ -60,6 +71,7 @@ class API
       $item['image_uri'] = API::getImage(GVS_IMAGE_TYPE, $item['image_id']);
     }
     $code = $req->getHttpCode();
+    // TODO: Search products here
     if ($code != 200) {
       return [];
     }
@@ -67,17 +79,38 @@ class API
     return $response;
   }
 
-  static function getProduct($type, $web, $id, $password, $username)
+  static function executeIncludingAuth(Request $request)
+  {
+    $user = getUser();
+    $username = $user['email'];
+    $password = $user['password'];
+    $request->execute(array("X-USER: $username", "X-PASSWORD: $password"));
+  }
+
+  static function getProduct($type, $web, $id)
   {
     $uri = getProductMap()[$web]($type, $id);
     $req = new Request($uri);
     $req->setRequestType('GET');
-    $req->execute(array("X-USER: $username", "X-PASSWORD: $password"));
+    API::executeIncludingAuth($req);
     $response = json_decode($req->getResponse(), true);
     if ($web == "gvs") {
       $response['image_uri'] = API::getImage(GVS_IMAGE_TYPE, $response['image']['id']);
       $response['web'] = 'gvs';
+    } else if ($web == "dani") {
+      // TODO:
     }
     return $response;
+  }
+
+  static function addToCart($quantity, $id, $web, $type)
+  {
+    $uri = getShopAddCartMap()[$web]($id, $type);
+    $req = new Request($uri);
+    $req->setRequestType('POST');
+    $req->setPostFields(["quantity" => $quantity]);
+    API::executeIncludingAuth($req);
+    $_ = json_decode($req->getResponse());
+    return $req->getHttpCode() == 200 ? true : false;
   }
 }

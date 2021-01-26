@@ -11,14 +11,11 @@ if (!isset($_GET['id']) || !isset($_GET['type']) || !isset($_GET['web'])) {
   exit();
 }
 redirectIfNotLogedIn();
-$user = getSession();
-$users = (new Model('users'))->Select('*')->Where(['email=' => $user['email']])->Do();
-if (!$users) {
-  echo "ERROR: Your user doesn't exist anymore for some reason :/";
-}
-$users = $users[0];
-$product = Api::getProduct($_GET['type'], $_GET['web'], $_GET['id'], $users['password'], $users['email']);
+$product = Api::getProduct($_GET['type'], $_GET['web'], $_GET['id']);
 $str = "";
+if (!isset($product['Current items in cart'])) {
+  $product['Current items in cart'] = 0;
+}
 foreach ($product as $key => $value) {
   if (
     stripos($key, "id") !== false ||
@@ -28,8 +25,9 @@ foreach ($product as $key => $value) {
     stripos($key, "web") !== false
   ) continue;
   $key = ucfirst($key);
-  $str .= "<br/>$key: $value";
+  $str .= "<br/>$key: <label id='$key'>$value</label>";
 }
+
 ?>
 <style>
   body {
@@ -161,10 +159,6 @@ foreach ($product as $key => $value) {
     color: #343a40;
     text-align: center;
     vertical-align: middle;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
     background-color: transparent;
     border: 1px solid transparent;
     padding: 0.45rem 0.85rem;
@@ -183,31 +177,98 @@ foreach ($product as $key => $value) {
     color: #FF5722
   }
 </style>
-<div class="container d-flex justify-content-center">
-  <figure class="card card-product-grid card-lg"> <a href="#" class="img-wrap" data-abc="true"> <img src="<?php
-                                                                                                          echo $product['image_uri']; ?>"> </a>
-    <figcaption class="info-wrap">
-      <div class="row">
-        <div class="col-md-9 col-xs-9"> <a href="#" class="title" data-abc="true">
-            <?php
-            echo $product['name']; ?></a> <span class="rated uppercase"><?php
-                                                                        echo $product['type']; ?></span> </div>
-        <div class="col-md-3 col-xs-3">
-          <div class="rating text-right"> <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> <span class="rated">Rated 5.0/5! Trust us...</span> </div>
-        </div>
 
-      </div>
-    </figcaption>
-    <div class="bottom-wrap-payment">
+<head>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <div class="container d-flex justify-content-center">
+    <figure class="card card-product-grid card-lg"> <a href="#" class="img-wrap" data-abc="true"> <img src="<?php
+                                                                                                            echo $product['image_uri']; ?>"> </a>
       <figcaption class="info-wrap">
         <div class="row">
-          <div class="col-md-9 col-xs-9"> <a href="#" class="title" data-abc="true">Price: $<?php
-                                                                                            echo $product['price'];
-                                                                                            echo $str; ?></a> </div>
+          <div class="col-md-9 col-xs-9"> <a href="#" class="title" data-abc="true">
+              <?php
+              echo $product['name']; ?></a> <span class="rated uppercase"><?php
+                                                                          echo $product['type']; ?></span> </div>
+          <div class="col-md-3 col-xs-3">
+            <div class="rating text-right"> <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> <i class="fa fa-star"></i> <span class="rated">Rated 5.0/5! Trust us...</span> </div>
+          </div>
+
         </div>
       </figcaption>
-    </div>
-    <div class="bottom-wrap"> <button id="buy" class="btn btn-primary float-right"> Add one to cart now TODO</button>
-    </div>
-  </figure>
-</div>
+      <div class="bottom-wrap-payment">
+        <figcaption class="info-wrap">
+          <div class="row">
+            <div class="col-md-9 col-xs-9"> <a href="#" class="title" data-abc="true">Price: $<?php
+                                                                                              echo $product['price'];
+                                                                                              echo $str; ?></a> </div>
+          </div>
+        </figcaption>
+      </div>
+      <div class="bottom-wrap">
+        Quantity
+        <input type="number" name="quantity" id="quantity_input">
+        <button id="buy" class="btn btn-primary ml-3">Add to cart</button>
+        <div id="htmlButton">
+        </div>
+        <p id="message"></p>
+      </div>
+    </figure>
+  </div>
+</body>
+<script>
+  let htmlButton = document.createElement('button', []);
+  htmlButton.className = 'btn btn-danger mt-3';
+  htmlButton.innerHTML = "Remove Item";
+  const message = document.getElementById('message');
+  const quantityInfo = document.getElementById('Quantity');
+  const addedInfo = document.getElementById('Current items in cart');
+  const quantityInput = document.getElementById('quantity_input');
+  const buttonBuy = document.getElementById('buy');
+  const buttonRemoveItemWrapper = document.getElementById('htmlButton');
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryString = `?id=${urlParams.get('id')}&type=${urlParams.get('type')}&web=${urlParams.get('web')}`;
+  if (+addedInfo.innerHTML > 0) {
+    buttonRemoveItemWrapper.appendChild(htmlButton);
+  }
+  buttonBuy.addEventListener('click', e => {
+    let passedQuantity = (+quantityInput.value) || 1;
+    message.innerHTML = 'Loading...';
+    fetch(
+        `${window.location.protocol}//${window.location.hostname}/ecommerce-group/add_cart.php${queryString}`, {
+          method: 'POST',
+          body: JSON.stringify({
+            quantity: +passedQuantity
+          })
+        }
+      )
+      .then(el => el.json())
+      .then(el => {
+        if (el.success) {
+          updateInfo(passedQuantity);
+          message.innerHTML = 'Successfully added to cart!';
+        } else {
+          message.innerHTML = "Couldn't add to cart";
+        }
+      }).catch(err => console.log(err));
+  });
+  htmlButton.addEventListener('click', e => {
+    console.log('removed');
+  });
+
+  function updateInfo(newQuantity) {
+    const newAdded = (parseInt(addedInfo.innerHTML, 10)) + newQuantity;
+    if (newAdded === newQuantity) {
+      buttonRemoveItemWrapper.appendChild(htmlButton);
+    }
+    if (newAdded === 0) {
+      buttonRemoveItemWrapper.removeChild(htmlButton);
+    }
+    addedInfo.innerHTML = newAdded;
+    quantityInfo.innerHTML = (parseInt(quantityInfo.innerHTML, 10)) - newQuantity;
+  }
+</script>
