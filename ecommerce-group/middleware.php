@@ -1,8 +1,9 @@
 <?php
 
+
 function redirectIfLogedIn()
 {
-  session_start();
+  if (session_status() === PHP_SESSION_NONE) session_start();
   if (isset($_SESSION['email'])) {
     header("Location: /ecommerce-group/products_html.php");
     return true;
@@ -12,7 +13,7 @@ function redirectIfLogedIn()
 
 function redirectIfNotLogedIn()
 {
-  session_start();
+  if (session_status() === PHP_SESSION_NONE) session_start();
   if (!isset($_SESSION['email'])) {
     header("Location: /ecommerce-group/login_html.php");
     return true;
@@ -22,7 +23,7 @@ function redirectIfNotLogedIn()
 
 function isLoged()
 {
-  session_start();
+  if (session_status() === PHP_SESSION_NONE) session_start();
   return isset($_SESSION['email']);
 }
 

@@ -1,5 +1,6 @@
 <?php
 require_once './db.php';
+require_once './navbar.php';
 require_once './api/api.php';
 require_once './middleware.php';
 require_once '../express-php/express.php';
@@ -257,7 +258,16 @@ foreach ($product as $key => $value) {
       }).catch(err => console.log(err));
   });
   htmlButton.addEventListener('click', e => {
-    console.log('removed');
+    fetch(
+        `${window.location.protocol}//${window.location.hostname}/ecommerce-group/remove_cart.php${queryString}`
+      )
+      .then(res => res.json())
+      .then(res => {
+        message.innerHTML = "Removed successfully from the cart";
+        if (res.success) {
+          updateInfo(-addedInfo.innerHTML);
+        }
+      }).catch(err => console.log(err));
   });
 
   function updateInfo(newQuantity) {
