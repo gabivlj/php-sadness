@@ -20,7 +20,7 @@ if (!isset($_POST['email']) || !isset($_POST['password'])) {
 }
 $email = $_POST['email'];
 $password = $_POST['password'];
-$users = (new Model('users'))->Select('*')->Where(['email=' => $email])->Do();
+$users = (new Model('users'))->Select('*')->Where(['email LIKE ' => $email])->Do();
 if ($users) {
   error();
   return;

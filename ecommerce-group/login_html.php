@@ -320,8 +320,9 @@ if (redirectIfLogedIn()) {
         <input type="text" id="login" class="fadeIn second" extra_type="text" name="email" placeholder="Email">
         <input type="password" extra_type="text" id="password" class="fadeIn third" name="password" placeholder="Password">
         <input type="submit" class="fadeIn fourth" value="Login">
-      </form>
 
+      </form>
+      <a href="./register_html.php" class="fadeIn fourth pb-3">Register</a>
     </div>
   </div>
 </body>
