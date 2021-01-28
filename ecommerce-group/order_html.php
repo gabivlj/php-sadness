@@ -1,10 +1,37 @@
 <?php
-require_once './db.php';
+require_once "./api/api.php";
+require_once "./db.php";
 require_once './navbar.php';
-require_once './api/api.php';
 require_once './middleware.php';
 require_once '../express-php/express.php';
+require_once '../express-php/uuid.php';
 
+initDB();
+
+if (redirectIfNotLogedIn()) {
+  die();
+}
+
+if (!isset($_GET["id"])) {
+  header("location: /ecommerce-group/orders_html.php");
+  die();
+}
+
+$user = getUser();
+
+$order = (new Model("orders"))
+  ->Select("*")
+  ->Limit(1)
+  ->Where(["user_id =" => $user["email"]])
+  ->And(["id=" => $_GET["id"]])->Do();
+
+
+if (!$order) {
+  header("location: /ecommerce-group/orders_html.php");
+  die();
+}
+$order = $order[0];
+$items = API::getItemsFromOrder($order);
 
 function newShopItem($price, $type, $web, $id, $name, $imageURI, $quantity)
 {
@@ -29,9 +56,6 @@ function newShopItem($price, $type, $web, $id, $name, $imageURI, $quantity)
   </li>";
 }
 
-$items = API::getCartItems()['items'];
-
-
 ?>
 
 <head>
@@ -42,7 +66,7 @@ $items = API::getCartItems()['items'];
 
 <body>
   <div class="container py-5">
-    <h1 class="display-4 pb-4">Shop Cart</h1>
+    <h1 class="display-4 pb-4">Order <?php echo $order['id']; ?></h1>
     <div class="row">
       <div class="col-lg-8 mx-auto">
         <!-- List group-->
@@ -55,9 +79,6 @@ $items = API::getCartItems()['items'];
         </ul>
       </div>
     </div>
-    <form action="./buy.php" method="POST">
-      <input type="submit" value="Buy" class="btn p-3 btn-primary">
-    </form>
   </div>
   <script src="./js/products.js"></script>
 </body>

@@ -4,6 +4,8 @@ require_once './middleware.php';
 
 if (redirectIfNotLogedIn()) die();
 
+$username = getUser()["email"];
+
 ?>
 
 <head>
@@ -24,6 +26,8 @@ if (redirectIfNotLogedIn()) die();
         <a class="nav-item nav-link" href="./logout.php">Logout</a>
         <a class="nav-item nav-link active" href="./products_html.php"> Products</a>
         <a class="nav-item nav-link" href="./shop_html.php">Shop Cart</a>
+        <a class="nav-item nav-link" href="./orders_html.php">Your orders</a>
+        <a class="nav-item nav-link disabled" href="#"><?php echo "$username"; ?></a>
       </div>
     </div>
   </nav>

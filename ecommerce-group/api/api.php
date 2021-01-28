@@ -164,4 +164,48 @@ class API
     $response = &$responseGVS;
     return $response;
   }
+
+  static $FULLFILL_CART_GVS = "http://apigvillalonga20.000webhostapp.com/shop/cart/fulfill";
+
+  static function fullFillCartGVS()
+  {
+    $req = new Request(API::$FULLFILL_CART_GVS);
+    $req->setRequestType('POST');
+    API::executeIncludingAuth($req);
+    $responseGVS = json_decode($req->getResponse(), true);
+    if (!isset($responseGVS["success"]) || $req->getHttpCode() !== 200) {
+      return ["success" => false];
+    }
+    return $responseGVS;
+  }
+
+  static function getOrderItemsGVS($id)
+  {
+    return "https://apigvillalonga20.000webhostapp.com/orders/order/json?order_id=$id";
+  }
+
+  static function getItemsFromOrder($order)
+  {
+    $items = [];
+    if (isset($order["gabi_id"]) && $order["gabi_id"]) {
+      $uri = API::getOrderItemsGVS($order["gabi_id"]);
+      $req = new Request($uri);
+      $req->setRequestType("GET");
+      API::executeIncludingAuth($req);
+      $responseGVS = json_decode($req->getResponse(), true);
+      if (isset($responseGVS["items"])) {
+        foreach ($responseGVS["items"] as $item) {
+          $item['image_uri'] = API::getImage(GVS_IMAGE_TYPE, $item["image_id"]);
+          $item['web'] = 'gvs';
+          $items[] = $item;
+        }
+      }
+    }
+
+    if (isset($order["dani_id"]) && $order["dani_id"]) {
+      // TODO: 
+    }
+
+    return $items;
+  }
 }
