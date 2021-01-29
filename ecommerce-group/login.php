@@ -23,7 +23,7 @@ if (!isset($_POST['email']) || !isset($_POST['password'])) {
 }
 $email = $_POST['email'];
 $password = $_POST['password'];
-$user = (new Model('users'))->Select('password')->Where(['email=' => $email])->Do();
+$user = (new Model('users'))->Select('password')->Where(['email=' => $email])->And(['confirmed=' => 1])->Do();
 if (!$user) {
   error("Bad credentials");
   return;

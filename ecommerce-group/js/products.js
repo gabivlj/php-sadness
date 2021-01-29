@@ -33,7 +33,7 @@ const input = document.getElementById('search_term');
 const loading = document.getElementById('loading');
 const select = document.getElementById('select');
 const tagElements = Array.from(document.querySelectorAll('.tag-filter'));
-console.log(tagElements);
+
 tagElements.forEach(tag => {
   tag.addEventListener('change', e => {
     tags[e.target.name] = e.target.checked;
@@ -86,10 +86,10 @@ function getItems() {
 
 getItems();
 
-const list = document.getElementById('list');
+const l = document.getElementById('list');
 
 function updateItems() {
-  list.innerHTML = currentProducts
+  l.innerHTML = currentProducts
     .map(({ name, type, price, image_uri, id, web }) =>
       newItem(name, type, price, image_uri, id, web)
     )
