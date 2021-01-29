@@ -1,4 +1,7 @@
 let currentSearch = '';
+// products that won't be affected by sort and filtering
+let products = [];
+// view products
 let currentProducts = [];
 
 const searchMethods = {
@@ -16,13 +19,36 @@ const searchMethods = {
   },
 };
 
+const tags = {
+  keyboards: true,
+  keycaps: true,
+  frames: true,
+  headset: true,
+  players: true,
+  albums: true,
+};
+
 const searchForm = document.getElementById('search');
 const input = document.getElementById('search_term');
 const loading = document.getElementById('loading');
 const select = document.getElementById('select');
+const tagElements = Array.from(document.querySelectorAll('.tag-filter'));
+console.log(tagElements);
+tagElements.forEach(tag => {
+  tag.addEventListener('change', e => {
+    tags[e.target.name] = e.target.checked;
+    currentProducts = products;
+    sortBy(prevSearchOrdering);
+    filter();
+    updateItems();
+  });
+});
+
+let prevSearchOrdering = '';
 
 select.addEventListener('change', e => {
-  sortBy(e.target.value);
+  prevSearchOrdering = e.target.value;
+  sortBy(prevSearchOrdering);
   updateItems();
 });
 
@@ -32,8 +58,12 @@ searchForm.addEventListener('submit', e => {
   getItems();
 });
 
+function filter() {
+  currentProducts = currentProducts.filter(element => tags[element.type]);
+}
+
 function sortBy(search) {
-  currentProducts.sort(searchMethods[search] || (() => 0));
+  currentProducts = currentProducts.sort(searchMethods[search] || (() => 0));
 }
 
 function getItems() {
@@ -43,10 +73,13 @@ function getItems() {
   )
     .then(el => el.json())
     .then(object => {
-      currentProducts = object.items;
+      products = object.items;
+      currentProducts = products;
+      sortBy(prevSearchOrdering);
+      filter();
       updateItems();
       loading.innerHTML = '';
-      console.log(currentProducts);
+      // console.log(currentProducts);
     })
     .catch(err => console.log(err));
 }

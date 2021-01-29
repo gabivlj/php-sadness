@@ -31,6 +31,18 @@ if (redirectIfNotLogedIn()) {
       <option value="nameAsc">Name Ascendent</option>
       <option value="nameDesc">Name Descendent</option>
     </select>
+    <input type="checkbox" name="keyboards" class="tag-filter" checked>
+    <label>Keyboards</label>
+    <input type="checkbox" name="keycaps" class="tag-filter" checked>
+    <label>Keycaps</label>
+    <input type="checkbox" name="frames" class="tag-filter" checked>
+    <label>Frames</label>
+    <input type="checkbox" name="headset" class="tag-filter" checked>
+    <label>Headsets</label>
+    <input type="checkbox" name="players" class="tag-filter" checked>
+    <label>Players</label>
+    <input type="checkbox" name="albums" class="tag-filter" checked>
+    <label>Albums</label>
     <h4 id="loading">Loading...</h4>
     <div class="row text-center text-white mb-5">
       <div class="col-lg-7 mx-auto">
