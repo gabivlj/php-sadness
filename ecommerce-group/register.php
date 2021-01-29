@@ -35,7 +35,7 @@ if (!$userCreatedOk) {
 }
 $hostname = App::get_host();
 $protocol = App::get_protocol();
-var_dump(sendEmail($email, "", "Welcome to PHPEcommerceMerger, please go to $protocol://$hostname/ecommerce-group/verification.php?e=$email&t=$response to verify your account"));
+sendEmail($email, "", "Welcome to PHPEcommerceMerger, please go to $protocol://$hostname/ecommerce-group/verification.php?e=$email&t=$response to verify your account");
 echo "We sent you an email. Please check inbox";
 // if (!API::registerOnEveryAPI($user)) {
 //   (new Model('users'))->Delete()->Where(['email=' => $email])->Do();

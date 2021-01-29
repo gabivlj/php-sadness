@@ -183,7 +183,6 @@ class API
 
   static function addToCart($quantity, $id, $web, $type)
   {
-
     $uri = getShopAddCartMap()[$web]($id, $type, $quantity);
     $req = new Request($uri);
     $req->setRequestType('POST');
@@ -214,7 +213,6 @@ class API
 
   static function getCartItemsDani()
   {
-
     $req = new Request(API::$CART_ITEMS_DANI);
     $req->setRequestType('GET');
     API::executeIncludingAuth($req);
