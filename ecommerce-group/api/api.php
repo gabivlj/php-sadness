@@ -118,7 +118,7 @@ class API
     $req->execute();
     $res = $req->getResponse();
     $responseDani = json_decode($res, true);
-    if (!isset($responseDani["items"])) {
+    if (!isset($responseDani["items"]) || !$responseDani["items"]) {
       return ["items" => []];
     }
     $responseDani["items"] = API::normalizeItemsDani($responseDani["items"]);
@@ -315,6 +315,7 @@ class API
       $responseDani = json_decode($req->getResponse(), true);
       if (isset($responseDani["order_items"])) {
         API::normalizeItemsDani($responseDani["order_items"]);
+
         foreach ($responseDani["order_items"] as &$item) {
           $item['type'] = $item["item_type"];
           $items[] = $item;

@@ -34,7 +34,6 @@ if ($responseGVS['success']) {
 if ($responseDani['success']) {
   $objectCreation["dani_id"] = $responseDani["order_id"];
 }
-
 $ok = $model->Create($objectCreation)->Do();
 if (!$ok) {
   echo "Couldn't create the order... Go back to the ecommerce...";
